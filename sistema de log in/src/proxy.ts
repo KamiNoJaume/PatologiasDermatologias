@@ -5,7 +5,7 @@ export default auth((req) => {
     const { pathname } = req.nextUrl;
     const isLoggedIn = !!req.auth;
 
-    const protectedRoutes = ["/landing", "/demo"];
+    const protectedRoutes = ["/landing", "/demo", "/dermvet"];
     const isProtected = protectedRoutes.some((route) =>
       pathname.startsWith(route)
     );
@@ -14,10 +14,6 @@ export default auth((req) => {
       const url = new URL("/login", req.url);
       url.searchParams.set("callbackUrl", pathname);
       return Response.redirect(url);
-    }
-
-    if (isLoggedIn && pathname === "/login") {
-      return Response.redirect(new URL("/landing", req.url));
     }
 
     return;

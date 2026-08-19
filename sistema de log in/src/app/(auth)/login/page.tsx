@@ -16,6 +16,15 @@ export default function LoginPage() {
           <LoginForm />
         </Suspense>
         <p className="text-center text-sm text-gray-600">
+          Olvidaste tu contrasena?{" "}
+          <Link
+            href="/forgot-password"
+            className="font-semibold text-primary hover:text-primary-dark"
+          >
+            Recuperar contrasena
+          </Link>
+        </p>
+        <p className="text-center text-sm text-gray-600">
           No tienes cuenta?{" "}
           <Link
             href="/signup"

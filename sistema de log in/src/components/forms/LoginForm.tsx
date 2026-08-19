@@ -11,13 +11,13 @@ import { loginSchema, type LoginInput } from "@/lib/validations";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const externalPortal = process.env.NEXT_PUBLIC_EXTERNAL_PORTAL_URL;
-  const defaultRedirect = externalPortal || "/landing";
+  const defaultRedirect = "/dermvet";
 
   function getSafeCallbackUrl(raw: string | null): string {
     if (!raw) return defaultRedirect;
-    if (raw.startsWith("/")) return raw;
-    if (externalPortal && raw.startsWith(externalPortal)) return raw;
+    if (raw.startsWith("/") && !raw.startsWith("//") && !raw.includes("\\")) {
+      return raw;
+    }
     return defaultRedirect;
   }
 

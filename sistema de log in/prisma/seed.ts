@@ -10,7 +10,7 @@ const prisma = new PrismaClient({
 
 async function main() {
   const email = "test@vet.com";
-  const password = "Test123!";
+  const password = "Test1234!";
 
   const existing = await prisma.user.findUnique({ where: { email } });
 
