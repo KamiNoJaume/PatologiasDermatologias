@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DermVet Pro — Panel de Analíticas y Telemetría Nacional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Tema Oscuro Premium */
+            --bg-base: #060913;
+            --bg-surface: #0f1626;
+            --bg-surface-elevated: #172237;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glowing: rgba(99, 102, 241, 0.35);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.1);
+            
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            
+            --danger: #f43f5e;
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.3);
+            
+            --shadow-main: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        [data-theme="light"] {
+            /* Tema Claro Premium */
+            --bg-base: #f3f4f6;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #f9fafb;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-glowing: rgba(99, 102, 241, 0.2);
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            
+            --success: #059669;
+            --success-bg: rgba(5, 150, 105, 0.08);
+            
+            --warning: #d97706;
+            --warning-bg: rgba(217, 119, 6, 0.08);
+            
+            --danger: #e11d48;
+            --cyan: #0891b2;
+            --cyan-glow: rgba(8, 145, 178, 0.15);
+            
+            --shadow-main: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .dashboard-container {
+            max-width: 1350px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            flex: 1;
+        }
+
+        /* ──────────────── Header ──────────────── */
+        .dash-header {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-main);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .dash-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .dash-logo {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--cyan));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--primary-glow);
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .dash-logo svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.2;
+        }
+
+        .dash-title h1 {
+            font-size: 1.25rem;
+            font-weight: 850;
+            line-height: 1.2;
+            font-family: var(--font-display);
+        }
+
+        .dash-title p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .dash-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .btn-action svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-primary-action:hover {
+            filter: brightness(1.1);
+        }
+
+        /* ──────────────── KPIs Row ──────────────── */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: var(--shadow-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary), var(--cyan));
+        }
+
+        .kpi-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 850;
+            font-family: var(--font-mono);
+            line-height: 1.1;
+        }
+
+        .kpi-trend {
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 600;
+        }
+
+        .kpi-trend.up { color: var(--success); }
+        .kpi-trend.down { color: var(--danger); }
+        .kpi-trend.neutral { color: var(--text-muted); }
+
+        .kpi-trend svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 3;
+        }
+
+        /* ──────────────── Main Workspaces ──────────────── */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1000px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card container */
+        .dash-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-main);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dash-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 14px;
+        }
+
+        .dash-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dash-card-title svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--primary);
+            fill: none;
+            stroke-width: 2.2;
+        }
+
+        .dash-card-title h2 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            font-family: var(--font-display);
+            letter-spacing: -0.01em;
+        }
+
+        /* Selector temporal bar */
+        .time-filter-bar {
+            display: flex;
+            background-color: var(--bg-surface-elevated);
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            border: 1px solid var(--border-color);
+        }
+
+        .time-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            font-size: 0.72rem;
+            font-weight: 750;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .time-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Map styling */
+        .map-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #03060d;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+        }
+
+        [data-theme="light"] .map-section {
+            background-color: #f8fafc;
+        }
+
+        .spain-map {
+            width: 100%;
+            height: 100%;
+            max-height: 380px;
+            color: var(--primary);
+        }
+
+        .map-region {
+            stroke-width: 1.8;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            stroke-linejoin: round;
+        }
+
+        /* Zonas con Alta Densidad (Madrid, Cataluña, Andalucía) */
+        .region-high {
+            fill: rgba(6, 182, 212, 0.2);
+            stroke: var(--cyan);
+        }
+        .region-high:hover {
+            fill: rgba(6, 182, 212, 0.45);
+            filter: drop-shadow(0 0 8px var(--cyan-glow));
+        }
+
+        /* Zonas con Media-Alta Densidad (Valencia, Galicia, Castilla y León) */
+        .region-med-high {
+            fill: rgba(99, 102, 241, 0.18);
+            stroke: var(--primary);
+        }
+        .region-med-high:hover {
+            fill: rgba(99, 102, 241, 0.38);
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        /* Zonas con Media-Baja Densidad (Castilla-La Mancha, País Vasco, Aragón, Canarias) */
+        .region-med-low {
+            fill: rgba(16, 185, 129, 0.12);
+            stroke: var(--success);
+        }
+        .region-med-low:hover {
+            fill: rgba(16, 185, 129, 0.32);
+            filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.3));
+        }
+
+        /* Zonas con Baja Densidad (Norte, Extremadura, Murcia, Baleares) */
+        .region-low {
+            fill: rgba(245, 158, 11, 0.1);
+            stroke: var(--warning);
+        }
+        .region-low:hover {
+            fill: rgba(245, 158, 11, 0.3);
+            filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.3));
+        }
+
+        .map-region.active {
+            fill: rgba(99, 102, 241, 0.45) !important;
+            stroke: #ffffff !important;
+            filter: drop-shadow(0 0 12px var(--primary-glow)) !important;
+        }
+
+        .map-tooltip {
+            position: absolute;
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-glowing);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            pointer-events: none;
+            box-shadow: var(--shadow-main);
+            display: none;
+            z-index: 10;
+        }
+
+        /* ──────────────── Regional Detail Card ──────────────── */
+        .detail-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .detail-stat-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .detail-mini-card {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .detail-mini-card span.lbl {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .detail-mini-card span.val {
+            font-size: 1.15rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+        }
+
+        .clinic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 160px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            background-color: var(--bg-surface-elevated);
+        }
+
+        .clinic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.74rem;
+            padding: 6px 8px;
+            border-radius: 4px;
+            background-color: var(--bg-base);
+            border-left: 3px solid var(--cyan);
+        }
+
+        .clinic-item span.name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .clinic-item span.cases {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        /* ──────────────── Bottom Grid ──────────────── */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 1000px) {
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Bar Chart */
+        .bar-chart-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chart-bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chart-bar-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            font-weight: 650;
+        }
+
+        .chart-bar-meta span.name {
+            color: var(--text-secondary);
+        }
+
+        .chart-bar-meta span.val {
+            font-family: var(--font-mono);
+        }
+
+        .chart-bar-track {
+            height: 8px;
+            background-color: var(--bg-surface-elevated);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--cyan));
+            border-radius: 100px;
+            width: 0%;
+            transition: width 0.6s ease-out;
+        }
+
+        /* Live feed */
+        .feed-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .feed-item {
+            display: flex;
+            gap: 14px;
+            padding: 12px 14px;
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            line-height: 1.45;
+            align-items: center;
+        }
+
+        .feed-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--cyan);
+            box-shadow: 0 0 6px var(--cyan);
+            flex-shrink: 0;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .feed-content {
+            flex: 1;
+        }
+
+        .feed-time {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Bottom Grid Mod - 3 Columns & Device Filter Selector styles */
+        .bottom-grid-three {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .device-selectors {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .device-card {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .device-card:hover {
+            border-color: var(--primary-glow);
+            background-color: rgba(99, 102, 241, 0.04);
+        }
+        .device-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(6, 182, 212, 0.05));
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+        .device-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--bg-base);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        .device-card.active .device-icon {
+            background-color: var(--primary);
+            color: white;
+        }
+        .device-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.2;
+        }
+        .device-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+        .device-name {
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .device-value {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        .device-card.active .device-value {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        [data-theme="light"] .device-card.active .device-value {
+            color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    
+    <!-- HEADER -->
+    <header class="dash-header">
+        <div class="dash-brand">
+            <div class="dash-logo">
+                <svg viewBox="0 0 24 24"><path d="M2 12h22M12 2v22M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93"/></svg>
+            </div>
+            <div class="dash-brand-text">
+                <div class="dash-title">
+                    <h1>DermVet Pro</h1>
+                    <p>Panel Ejecutivo de Telemetría Nacional y Cobertura Clínica</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dash-controls">
+            <button class="btn-action" onclick="toggleTheme()">
+                <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span id="theme-lbl">TEMA OSCURO</span>
+            </button>
+            <a href="index.html" class="btn-action btn-primary-action">
+                <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                Volver al Asistente Clínico
+            </a>
+        </div>
+    </header>
+
+    <!-- METRICS ROW -->
+    <section class="kpi-row">
+        <div class="kpi-card">
+            <span class="kpi-label">Veterinarios Registrados</span>
+            <span class="kpi-value" id="kpi-vets-total">1.428</span>
+            <div class="kpi-trend up">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                +24.5% este año
+            </div>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Veterinarios Activos</span>
+            <span class="kpi-value" id="kpi-vets-active">162</span>
+            <div class="kpi-trend up" id="kpi-vets-active-trend">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                +4.2% vs prec.
+            </div>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Consultas Clínicas</span>
+            <span class="kpi-value" id="kpi-queries">342</span>
+            <div class="kpi-trend up" id="kpi-queries-trend">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                +8.7% vs prec.
+            </div>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label" id="kpi-media-label">Media Diaria</span>
+            <span class="kpi-value" id="kpi-media">2.11</span>
+            <div class="kpi-trend up" id="kpi-media-trend">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                +3.8% actividad
+            </div>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label" style="color: var(--cyan); font-weight:800;">Derivaciones a Ceva</span>
+            <span class="kpi-value" id="kpi-ceva-clicks">84</span>
+            <div class="kpi-trend up" id="kpi-ceva-trend">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                +10.2% clics
+            </div>
+        </div>
+    </section>
+
+    <!-- WORKSPACE: MAP & REGIONAL DATA -->
+    <main class="workspace-grid">
+        
+        <!-- CARD: MAP OF SPAIN -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-10 10c0 5.25 10 12 10 12s10-6.75 10-12A10 10 0 0 0 12 2zm0 13a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"/></svg>
+                    <h2>Distribución y Cobertura por Comunidad Autónoma</h2>
+                </div>
+                
+                <div class="time-filter-bar">
+                    <button class="time-btn active" onclick="setTimeframe('diario')">Diario</button>
+                    <button class="time-btn" onclick="setTimeframe('semanal')">Semanal</button>
+                    <button class="time-btn" onclick="setTimeframe('mensual')">Mensual</button>
+                    <button class="time-btn" onclick="setTimeframe('anual')">Anual</button>
+                </div>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -10px;">
+                Pasa el ratón sobre una comunidad para ver datos rápidos. Haz clic en una región para **bloquear el filtro regional** y ver los detalles locales en la barra derecha. Haz clic en el fondo del mapa para restablecer el filtro nacional.
+            </p>
+
+            <div class="map-section" id="map-parent" style="flex-direction: column;">
+                <!-- SVG map of Spain (simplified polygon/hex layout) -->
+                <svg viewBox="0 0 500 420" class="spain-map" id="spain-map-svg" onclick="handleMapBgClick(event)">
+                    <!-- Galicia -->
+                    <polygon id="ES-GA" points="40,50 100,50 90,110 30,110" class="map-region region-med-high" data-region="Galicia" onclick="selectRegion('Galicia', event)" />
+                    
+                    <!-- Asturias -->
+                    <polygon id="ES-AS" points="100,50 150,50 150,75 100,75" class="map-region region-low" data-region="Asturias" onclick="selectRegion('Asturias', event)" />
+                    
+                    <!-- Cantabria -->
+                    <polygon id="ES-CB" points="150,50 190,50 190,75 150,75" class="map-region region-low" data-region="Cantabria" onclick="selectRegion('Cantabria', event)" />
+                    
+                    <!-- País Vasco -->
+                    <polygon id="ES-PV" points="190,50 230,55 225,80 190,75" class="map-region region-med-low" data-region="País Vasco" onclick="selectRegion('País Vasco', event)" />
+                    
+                    <!-- Navarra -->
+                    <polygon id="ES-NC" points="230,55 265,60 260,95 225,80" class="map-region region-low" data-region="Navarra" onclick="selectRegion('Navarra', event)" />
+                    
+                    <!-- La Rioja -->
+                    <polygon id="ES-LO" points="190,75 225,80 220,95 190,90" class="map-region region-low" data-region="La Rioja" onclick="selectRegion('La Rioja', event)" />
+                    
+                    <!-- Aragón -->
+                    <polygon id="ES-AR" points="265,60 330,80 310,180 250,160 260,95" class="map-region region-med-low" data-region="Aragón" onclick="selectRegion('Aragón', event)" />
+                    
+                    <!-- Cataluña -->
+                    <polygon id="ES-CT" points="330,80 400,100 380,160 320,165 310,120" class="map-region region-high" data-region="Cataluña" onclick="selectRegion('Cataluña', event)" />
+                    
+                    <!-- Castilla y León -->
+                    <polygon id="ES-CL" points="100,75 190,75 190,90 250,160 190,200 90,200 90,110" class="map-region region-med-high" data-region="Castilla y León" onclick="selectRegion('Castilla y León', event)" />
+                    
+                    <!-- Madrid -->
+                    <polygon id="ES-MD" points="180,160 210,160 210,185 180,185" class="map-region region-high" data-region="Madrid" onclick="selectRegion('Madrid', event)" />
+                    
+                    <!-- Extremadura -->
+                    <polygon id="ES-EX" points="90,200 150,200 140,300 80,300" class="map-region region-low" data-region="Extremadura" onclick="selectRegion('Extremadura', event)" />
+                    
+                    <!-- Castilla-La Mancha -->
+                    <polygon id="ES-CM" points="150,200 250,160 280,260 220,310 160,310 150,260" class="map-region region-med-low" data-region="Castilla-La Mancha" onclick="selectRegion('Castilla-La Mancha', event)" />
+                    
+                    <!-- Comunidad Valenciana -->
+                    <polygon id="ES-VC" points="280,260 325,230 330,280 290,330 270,300" class="map-region region-med-high" data-region="Comunidad Valenciana" onclick="selectRegion('Comunidad Valenciana', event)" />
+                    
+                    <!-- Murcia -->
+                    <polygon id="ES-MC" points="250,315 290,330 275,360 240,345" class="map-region region-low" data-region="Murcia" onclick="selectRegion('Murcia', event)" />
+                    
+                    <!-- Andalucía -->
+                    <polygon id="ES-AN" points="80,300 220,310 240,345 230,390 120,390 100,350" class="map-region region-high" data-region="Andalucía" onclick="selectRegion('Andalucía', event)" />
+                    
+                    <!-- Baleares -->
+                    <circle cx="370" cy="200" r="14" class="map-region region-low" data-region="Baleares" onclick="selectRegion('Baleares', event)" />
+                    <circle cx="385" cy="215" r="8" class="map-region region-low" data-region="Baleares" onclick="selectRegion('Baleares', event)" />
+                    
+                    <!-- Canarias (Inset Box) -->
+                    <g class="canarias-group" onclick="event.stopPropagation()">
+                        <rect x="20" y="330" width="130" height="80" fill="none" stroke="var(--border-color)" stroke-dasharray="3 3" />
+                        <text x="28" y="344" fill="var(--text-muted)" font-size="9" font-family="monospace">Islas Canarias</text>
+                        <polygon id="ES-CN-1" points="35,370 65,370 60,390 35,390" class="map-region region-med-low" data-region="Canarias" onclick="selectRegion('Canarias', event)" />
+                        <polygon id="ES-CN-2" points="80,365 110,365 105,380 80,380" class="map-region region-med-low" data-region="Canarias" />
+                    </g>
+                </svg>
+
+                <!-- LEYENDA DEL MAPA COLOREADO -->
+                <div style="display:flex; justify-content:center; gap:16px; margin-top:12px; flex-wrap:wrap; font-size:0.68rem; font-weight:700; border-top: 1px solid var(--border-color); width: 100%; padding-top: 12px;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="display:inline-block; width:12px; height:12px; background:rgba(6, 182, 212, 0.2); border:1px solid var(--cyan); border-radius:3px;"></span>
+                        <span>Alta Cobertura (>200 Vets)</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="display:inline-block; width:12px; height:12px; background:rgba(99, 102, 241, 0.18); border:1px solid var(--primary); border-radius:3px;"></span>
+                        <span>Media-Alta (80-200 Vets)</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="display:inline-block; width:12px; height:12px; background:rgba(16, 185, 129, 0.12); border:1px solid var(--success); border-radius:3px;"></span>
+                        <span>Media-Baja (40-80 Vets)</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="display:inline-block; width:12px; height:12px; background:rgba(245, 158, 11, 0.1); border:1px solid var(--warning); border-radius:3px;"></span>
+                        <span>Baja Cobertura (<40 Vets)</span>
+                    </div>
+                </div>
+
+                <!-- TOOLTIP MAPA -->
+                <div class="map-tooltip" id="map-tooltip">
+                    <strong>Madrid</strong><br>
+                    Vets: 42<br>
+                    Casos: 130
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD: DETALLES DE LA REGION -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    <h2 id="region-panel-title">Reporte Clínico: Todo el País</h2>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span id="device-filter-badge" style="font-size:0.68rem; font-weight:700; color:var(--cyan); background-color:var(--cyan-glow); padding:4px 10px; border-radius:100px; text-transform:uppercase; display:none;">Filtro: PC</span>
+                    <span id="region-scope-badge" style="font-size:0.68rem; font-weight:700; color:var(--success); background-color:var(--success-bg); padding:4px 10px; border-radius:100px; text-transform:uppercase;">Nivel Nacional</span>
+                </div>
+            </div>
+
+            <div class="detail-panel">
+                <div class="detail-stat-row">
+                    <div class="detail-mini-card">
+                        <span class="lbl">Veterinarios</span>
+                        <span class="val" id="reg-vets">1.428</span>
+                    </div>
+                    <div class="detail-mini-card">
+                        <span class="lbl">Consultas</span>
+                        <span class="val" id="reg-queries">342</span>
+                    </div>
+                </div>
+                <div class="detail-stat-row">
+                    <div class="detail-mini-card">
+                        <span class="lbl">Media de Actividad</span>
+                        <span class="val" id="reg-media">2.11 / Vet</span>
+                    </div>
+                    <div class="detail-mini-card">
+                        <span class="lbl">Patrón Frecuente</span>
+                        <span class="val" id="reg-pattern" style="font-size:0.95rem; font-weight:800; color:var(--primary);">Pruriginoso</span>
+                    </div>
+                </div>
+
+                <!-- CLINIC LIST FOR REGION -->
+                <div style="display:flex; flex-direction:column; gap:6px; margin-top:8px;">
+                    <span class="kpi-label" style="font-size: 0.68rem;">Centros Veterinarios Destacados</span>
+                    <div class="clinic-list" id="reg-clinic-list">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+
+                <div style="font-size:0.75rem; color:var(--text-muted); line-height:1.45; border-top:1px solid var(--border-color); padding-top:12px;">
+                    * Datos recalculados en base al feed de telemetría segura. Las clínicas mostradas están reportando actividad en tiempo real.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM GRID: DEMOGRAPHICS, PATTERNS & DEVICES -->
+    <section class="bottom-grid-three">
+        
+        <!-- CARD: PERFIL DEMOGRÁFICO -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <h2>Perfil de Usuarios (Demografía)</h2>
+                </div>
+                <span class="kpi-label" style="font-size:0.65rem;">Veterinarios</span>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:16px;">
+                <!-- Edad Media large display -->
+                <div style="display:flex; align-items:center; justify-content:space-between; background-color:var(--bg-surface-elevated); padding:10px 14px; border-radius:var(--radius-sm); border: 1px solid var(--border-color);">
+                    <span style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">Edad Media de Usuarios</span>
+                    <span id="demo-avg-age" style="font-size:1.4rem; font-weight:850; font-family:var(--font-mono); color:var(--cyan);">34.2 años</span>
+                </div>
+
+                <!-- Gender distribution visual bar -->
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-weight:700;">
+                        <span style="color:var(--text-secondary);">Distribución por Género</span>
+                    </div>
+                    <div style="height:18px; background-color:var(--bg-surface-elevated); border-radius:100px; display:flex; overflow:hidden; border: 1px solid var(--border-color);">
+                        <div id="demo-gender-female" style="height:100%; width:65%; background:linear-gradient(90deg, #ec4899, #f43f5e); display:flex; align-items:center; justify-content:center; color:white; font-size:0.65rem; font-weight:800; transition: width 0.5s ease;">
+                            F: 65%
+                        </div>
+                        <div id="demo-gender-male" style="height:100%; width:35%; background:linear-gradient(90deg, var(--primary), var(--cyan)); display:flex; align-items:center; justify-content:center; color:white; font-size:0.65rem; font-weight:800; transition: width 0.5s ease;">
+                            M: 35%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Age ranges breakdown -->
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <span style="font-size:0.72rem; font-weight:700; color:var(--text-secondary);">Distribución por Edad</span>
+                    
+                    <div class="chart-bar-item">
+                        <div class="chart-bar-meta" style="font-size:0.68rem;">
+                            <span class="name">22 - 30 años (Residentes)</span>
+                            <span class="val" id="demo-age-22-30-pct">32%</span>
+                        </div>
+                        <div class="chart-bar-track" style="height: 5px;">
+                            <div class="chart-bar-fill" id="demo-age-22-30-fill" style="width: 32%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-bar-item">
+                        <div class="chart-bar-meta" style="font-size:0.68rem;">
+                            <span class="name">31 - 45 años (Sénior)</span>
+                            <span class="val" id="demo-age-31-45-pct">49%</span>
+                        </div>
+                        <div class="chart-bar-track" style="height: 5px;">
+                            <div class="chart-bar-fill" id="demo-age-31-45-fill" style="width: 49%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-bar-item">
+                        <div class="chart-bar-meta" style="font-size:0.68rem;">
+                            <span class="name">Más de 45 años (Dirección)</span>
+                            <span class="val" id="demo-age-45-pct">19%</span>
+                        </div>
+                        <div class="chart-bar-track" style="height: 5px;">
+                            <div class="chart-bar-fill" id="demo-age-45-fill" style="width: 19%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD: PATRONES BREAKDOWN -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <h2>Distribución por Patrón Lesional</h2>
+                </div>
+                <span class="kpi-label" style="font-size:0.65rem;">Porcentaje Clínico</span>
+            </div>
+
+            <div class="bar-chart-row" id="pattern-bar-chart">
+                <!-- Se llena dinámicamente con las barras correspondientes -->
+            </div>
+        </div>
+
+        <!-- CARD: DISPOSITIVOS DE ACCESO -->
+        <div class="dash-card">
+            <div class="dash-card-header">
+                <div class="dash-card-title">
+                    <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" fill="none" stroke-width="2.2"/><line x1="9" y1="9" x2="15" y2="9" stroke="currentColor" stroke-width="2.2"/><line x1="9" y1="13" x2="15" y2="13" stroke="currentColor" stroke-width="2.2"/></svg>
+                    <h2>Canal de Acceso (Filtrar Telemetría)</h2>
+                </div>
+                <span class="kpi-label" style="font-size:0.65rem;">Clic para Filtrar</span>
+            </div>
+
+            <p style="font-size: 0.72rem; color: var(--text-secondary); margin-top:-8px; line-height: 1.45;">
+                Haz clic en un canal para filtrar todo el panel nacional, KPIs, demografía y el feed en tiempo real.
+            </p>
+
+            <div class="device-selectors">
+                <div class="device-card active" id="device-todos" onclick="setDeviceFilter('todos')">
+                    <div class="device-icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                    </div>
+                    <div class="device-info">
+                        <span class="device-name">Todos los Canales</span>
+                        <span class="device-value">100% de consultas</span>
+                    </div>
+                </div>
+                <div class="device-card" id="device-pc" onclick="setDeviceFilter('pc')">
+                    <div class="device-icon">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <div class="device-info">
+                        <span class="device-name">Ordenadores (PC / Mac)</span>
+                        <span class="device-value">58% de consultas</span>
+                    </div>
+                </div>
+                <div class="device-card" id="device-movil" onclick="setDeviceFilter('movil')">
+                    <div class="device-icon">
+                        <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    </div>
+                    <div class="device-info">
+                        <span class="device-name">Dispositivos Móviles</span>
+                        <span class="device-value">42% de consultas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- FULL WIDTH: LIVE ACTIVITY TIMELINE -->
+    <section class="dash-card" style="margin-top: 24px;">
+        <div class="dash-card-header">
+            <div class="dash-card-title">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <h2>Registro de Consultas en Tiempo Real (Telemetría Nacional)</h2>
+            </div>
+            <span class="kpi-label" style="color:var(--cyan); display:flex; align-items:center; gap:4px; font-size:0.65rem;">
+                <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:var(--cyan); animation: pulse-dot 1.8s infinite;"></span>
+                TELEMETRÍA EN DIRECTO
+            </span>
+        </div>
+
+        <div class="feed-timeline" id="live-timeline" style="max-height: 280px;">
+            <!-- Generado dinámicamente -->
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer" style="text-align: center; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 20px;">
+        DermVet Pro — Panel de Analíticas para Dirección y Marketing corporativo. Datos cifrados de conformidad con la normativa de telemetría clínica 2026.
+    </footer>
+
+</div>
+
+<!-- ==================== SCRIPT DE LOGICA ==================== -->
+<script>
+// ─────────────────────────────────────────────────────────────
+// BASE DE DATOS DE MOCK ANALYTICS GENERAL
+// ─────────────────────────────────────────────────────────────
+const REGIONS_DATA = {
+    'Galicia': {
+        vets: 94,
+        queries: { diario: 18, semanal: 130, mensual: 512, anual: 6240 },
+        pattern: 'Alopécico',
+        patternPct: '36%',
+        clinics: [
+            { name: 'Clínica Vet Cantodouro (Vigo)', cases: 24 },
+            { name: 'Centro Vet San Martín (Santiago)', cases: 18 },
+            { name: 'Clínica Veterinaria Ronda (Lugo)', cases: 12 }
+        ]
+    },
+    'Asturias': {
+        vets: 32,
+        queries: { diario: 6, semanal: 42, mensual: 174, anual: 2090 },
+        pattern: 'Pruriginoso',
+        patternPct: '41%',
+        clinics: [
+            { name: 'Clínica Vet Naranco (Oviedo)', cases: 14 },
+            { name: 'Vet Gijón Centro', cases: 9 }
+        ]
+    },
+    'Cantabria': {
+        vets: 24,
+        queries: { diario: 4, semanal: 28, mensual: 112, anual: 1410 },
+        pattern: 'Pustular-vesicular',
+        patternPct: '32%',
+        clinics: [
+            { name: 'Urgencias Vet Cantabria (Santander)', cases: 11 },
+            { name: 'Vet Laredo Port', cases: 5 }
+        ]
+    },
+    'País Vasco': {
+        vets: 64,
+        queries: { diario: 14, semanal: 98, mensual: 390, anual: 4680 },
+        pattern: 'Pruriginoso',
+        patternPct: '39%',
+        clinics: [
+            { name: 'Clínica Veterinaria Indautxu (Bilbao)', cases: 31 },
+            { name: 'Centro Vet Donostia', cases: 22 },
+            { name: 'Albia Vet Gasteiz', cases: 14 }
+        ]
+    },
+    'Navarra': {
+        vets: 18,
+        queries: { diario: 3, semanal: 22, mensual: 94, anual: 1120 },
+        pattern: 'Pruriginoso',
+        patternPct: '35%',
+        clinics: [
+            { name: 'Vet Pamplona Centro', cases: 8 },
+            { name: 'Clínica Vet Leyre (Tudela)', cases: 4 }
+        ]
+    },
+    'La Rioja': {
+        vets: 12,
+        queries: { diario: 2, semanal: 14, mensual: 62, anual: 740 },
+        pattern: 'Alopécico',
+        patternPct: '30%',
+        clinics: [
+            { name: 'Logroño Vet Urgencias', cases: 6 }
+        ]
+    },
+    'Aragón': {
+        vets: 50,
+        queries: { diario: 10, semanal: 72, mensual: 310, anual: 3690 },
+        pattern: 'Alopécico',
+        patternPct: '33%',
+        clinics: [
+            { name: 'Centro Veterinario Zaragoza Sur', cases: 18 },
+            { name: 'Clínica Vet Pirineos (Huesca)', cases: 12 }
+        ]
+    },
+    'Cataluña': {
+        vets: 268,
+        queries: { diario: 62, semanal: 442, mensual: 1810, anual: 21640 },
+        pattern: 'Pruriginoso',
+        patternPct: '40%',
+        clinics: [
+            { name: 'Centro Vet Universitario (UAB)', cases: 78 },
+            { name: 'Vet Diagonal Barcelona', cases: 54 },
+            { name: 'Clínica Vet Girona', cases: 32 },
+            { name: 'Survet Urgencias (Barcelona)', cases: 29 }
+        ]
+    },
+    'Castilla y León': {
+        vets: 86,
+        queries: { diario: 16, semanal: 120, mensual: 480, anual: 5780 },
+        pattern: 'Pruriginoso',
+        patternPct: '34%',
+        clinics: [
+            { name: 'Centro Vet Universitario de León', cases: 29 },
+            { name: 'Clínica Vet Valladolid Imperial', cases: 16 },
+            { name: 'Vet Burgos Centro', cases: 11 }
+        ]
+    },
+    'Madrid': {
+        vets: 312,
+        queries: { diario: 78, semanal: 520, mensual: 2160, anual: 26048 },
+        pattern: 'Pruriginoso',
+        patternPct: '44%',
+        clinics: [
+            { name: 'Clínica Vet Retiro (Madrid)', cases: 94 },
+            { name: 'Clínica Vet Puerta de Hierro', cases: 62 },
+            { name: 'Clínica Vet Madrid Sur', cases: 41 },
+            { name: 'Vet Complutense (Alcalá)', cases: 38 }
+        ]
+    },
+    'Extremadura': {
+        vets: 38,
+        queries: { diario: 6, semanal: 48, mensual: 194, anual: 2310 },
+        pattern: 'Pustular-vesicular',
+        patternPct: '31%',
+        clinics: [
+            { name: 'Vet Cáceres Central', cases: 10 },
+            { name: 'Clínica Veterinaria Guadiana (Badajoz)', cases: 8 }
+        ]
+    },
+    'Castilla-La Mancha': {
+        vets: 72,
+        queries: { diario: 12, semanal: 94, mensual: 384, anual: 4610 },
+        pattern: 'Pustular-vesicular',
+        patternPct: '29%',
+        clinics: [
+            { name: 'Clínica Vet Toledo Real', cases: 15 },
+            { name: 'Vet Albacete Imperial', cases: 11 }
+        ]
+    },
+    'Comunidad Valenciana': {
+        vets: 142,
+        queries: { diario: 34, semanal: 248, mensual: 982, anual: 11840 },
+        pattern: 'Pustular-vesicular',
+        patternPct: '35%',
+        clinics: [
+            { name: 'Clínica Vet Constitución (Valencia)', cases: 44 },
+            { name: 'Alicante Vet Clinic Centro', cases: 26 },
+            { name: 'Vet Castellón Norte', cases: 18 }
+        ]
+    },
+    'Murcia': {
+        vets: 24,
+        queries: { diario: 4, semanal: 30, mensual: 124, anual: 1520 },
+        pattern: 'Pustular-vesicular',
+        patternPct: '30%',
+        clinics: [
+            { name: 'Clínica Vet Murcia Sur', cases: 12 },
+            { name: 'Vet Cartagena Port', cases: 7 }
+        ]
+    },
+    'Andalucía': {
+        vets: 228,
+        queries: { diario: 52, semanal: 390, mensual: 1547, anual: 18920 },
+        pattern: 'Pruriginoso',
+        patternPct: '38%',
+        clinics: [
+            { name: 'Clínica Vet Guadiamar (Sevilla)', cases: 68 },
+            { name: 'Clínica Vet Málaga Centro', cases: 42 },
+            { name: 'Clínica Vet Córdoba Sur', cases: 28 },
+            { name: 'Centro Vet Granada Alhambra', cases: 21 }
+        ]
+    },
+    'Baleares': {
+        vets: 28,
+        queries: { diario: 5, semanal: 38, mensual: 156, anual: 1820 },
+        pattern: 'Pruriginoso',
+        patternPct: '42%',
+        clinics: [
+            { name: 'Clínica Vet Palma Planas', cases: 15 },
+            { name: 'Vet Ibiza Bay', cases: 6 }
+        ]
+    },
+    'Canarias': {
+        vets: 42,
+        queries: { diario: 8, semanal: 62, mensual: 246, anual: 2980 },
+        pattern: 'Alopécico',
+        patternPct: '35%',
+        clinics: [
+            { name: 'Clínica Vet Las Palmas Centro', cases: 18 },
+            { name: 'Tenerife Vet Urgencias', cases: 12 }
+        ]
+    }
+};
+
+const TIMEFRAME_OVERALL = {
+    diario: { activeVets: 162, queries: 342, media: '2.11 / Vet Activo', trendVets: '+4.2%', trendQueries: '+8.7%', trendMedia: '+3.8%', cevaBase: 84, trendCeva: '+10.2%' },
+    semanal: { activeVets: 684, queries: 2480, media: '354.3 / Día', trendVets: '+11.8%', trendQueries: '+14.2%', trendMedia: '+12.5%', cevaBase: 620, trendCeva: '+12.4%' },
+    mensual: { activeVets: 1248, queries: 9820, media: '327.3 / Día', trendVets: '+8.3%', trendQueries: '+10.5%', trendMedia: '+9.1%', cevaBase: 2480, trendCeva: '+11.1%' },
+    anual: { activeVets: 1428, queries: 118400, media: '324.4 / Día', trendVets: '+24.5%', trendQueries: '+32.1%', trendMedia: '+28.3%', cevaBase: 29480, trendCeva: '+26.8%' }
+};
+
+const MOCK_LIVE_EVENTS = [
+    { vet: 'Dr. Alejandro', city: 'Madrid', pattern: 'Pruriginoso', diag: 'Dermatitis Atópica', device: 'pc' },
+    { vet: 'Dra. María', city: 'Barcelona', pattern: 'Alopécico', diag: 'Dermatofitosis Fúngica', device: 'movil' },
+    { vet: 'Dr. Javier', city: 'Valencia', pattern: 'Pustular-vesicular', diag: 'Pioderma Superficial', device: 'pc' },
+    { vet: 'Dra. Carmen', city: 'Sevilla', pattern: 'Pruriginoso', diag: 'Escabiosis Sarcóptica', device: 'movil' },
+    { vet: 'Dr. Ramón', city: 'Bilbao', pattern: 'Pruriginoso', diag: 'Dermatitis Atópica', device: 'pc' },
+    { vet: 'Dra. Laura', city: 'Vigo', pattern: 'Alopécico', diag: 'Dermatofitosis Fúngica', device: 'movil' },
+    { vet: 'Dr. Sergio', city: 'Zaragoza', pattern: 'Alopécico', diag: 'Alopecia Endocrina', device: 'pc' },
+    { vet: 'Dra. Isabel', city: 'Málaga', pattern: 'Pustular-vesicular', diag: 'Pénfigo Foliáceo', device: 'movil' },
+    { vet: 'Dr. Francisco', city: 'Murcia', pattern: 'Erosivo-ulcerativo', diag: 'Lupus Eritematoso', device: 'pc' },
+    { vet: 'Dra. Marta', city: 'Alicante', pattern: 'Seborreico', diag: 'Dermatosis Zinc-Sensible', device: 'movil' },
+    { vet: 'Dr. Manuel', city: 'Valladolid', pattern: 'Papulo-placo-nodular', diag: 'Mastocitoma Cutáneo', device: 'pc' },
+    { vet: 'Dra. Elena', city: 'Gijón', pattern: 'Pruriginoso', diag: 'Dermatitis Atópica', device: 'movil' }
+];
+
+let currentTimeframe = 'diario';
+let selectedRegionKey = null;
+let currentDeviceFilter = 'todos';
+
+// ─────────────────────────────────────────────────────────────
+// RENDERIZADO DE CONTENIDOS Y EVENTOS
+// ─────────────────────────────────────────────────────────────
+function setTimeframe(timeframe) {
+    currentTimeframe = timeframe;
+    
+    // Cambiar clase activa
+    document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const clickedBtn = Array.from(document.querySelectorAll('.time-btn')).find(btn => btn.textContent.toLowerCase() === timeframe);
+    if (clickedBtn) clickedBtn.classList.add('active');
+
+    updateOverallKPIs();
+    updateRegionalPanel();
+    updateCharts();
+}
+
+function setDeviceFilter(device) {
+    currentDeviceFilter = device;
+    
+    document.querySelectorAll('.device-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    const activeCard = document.getElementById(`device-${device}`);
+    if (activeCard) {
+        activeCard.classList.add('active');
+    }
+    
+    const badge = document.getElementById('device-filter-badge');
+    if (device === 'todos') {
+        badge.style.display = 'none';
+    } else {
+        badge.style.display = 'inline-block';
+        badge.textContent = `Filtro: ${device === 'pc' ? 'PC' : 'Móvil'}`;
+    }
+    
+    updateOverallKPIs();
+    updateRegionalPanel();
+    updateCharts();
+    updateDemographics();
+    updateLiveFeed();
+}
+
+function updateDemographics() {
+    const avgAgeEl = document.getElementById('demo-avg-age');
+    const genderFemaleEl = document.getElementById('demo-gender-female');
+    const genderMaleEl = document.getElementById('demo-gender-male');
+    const age22_30PctEl = document.getElementById('demo-age-22-30-pct');
+    const age31_45PctEl = document.getElementById('demo-age-31-45-pct');
+    const age45PctEl = document.getElementById('demo-age-45-pct');
+    const age22_30Fill = document.getElementById('demo-age-22-30-fill');
+    const age31_45Fill = document.getElementById('demo-age-31-45-fill');
+    const age45Fill = document.getElementById('demo-age-45-fill');
+    
+    let avgAge = '34.2 años';
+    let femalePct = 65;
+    let malePct = 35;
+    let age22_30 = 32;
+    let age31_45 = 49;
+    let age45 = 19;
+    
+    if (currentDeviceFilter === 'movil') {
+        avgAge = '31.8 años';
+        femalePct = 72;
+        malePct = 28;
+        age22_30 = 48;
+        age31_45 = 41;
+        age45 = 11;
+    } else if (currentDeviceFilter === 'pc') {
+        avgAge = '39.5 años';
+        femalePct = 58;
+        malePct = 42;
+        age22_30 = 15;
+        age31_45 = 55;
+        age45 = 30;
+    }
+    
+    avgAgeEl.textContent = avgAge;
+    genderFemaleEl.textContent = `F: ${femalePct}%`;
+    genderFemaleEl.style.width = `${femalePct}%`;
+    genderMaleEl.textContent = `M: ${malePct}%`;
+    genderMaleEl.style.width = `${malePct}%`;
+    age22_30PctEl.textContent = `${age22_30}%`;
+    age22_30Fill.style.width = `${age22_30}%`;
+    age31_45PctEl.textContent = `${age31_45}%`;
+    age31_45Fill.style.width = `${age31_45}%`;
+    age45PctEl.textContent = `${age45}%`;
+    age45Fill.style.width = `${age45}%`;
+}
+
+function updateOverallKPIs() {
+    const data = TIMEFRAME_OVERALL[currentTimeframe];
+    let multiplier = 1.0;
+    if (currentDeviceFilter === 'pc') multiplier = 0.58;
+    else if (currentDeviceFilter === 'movil') multiplier = 0.42;
+
+    const activeVetsVal = Math.round(data.activeVets * multiplier);
+    document.getElementById('kpi-vets-active').textContent = activeVetsVal;
+    document.getElementById('kpi-vets-active-trend').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>${data.trendVets} vs prec.`;
+    
+    const queriesVal = Math.round(data.queries * multiplier);
+    document.getElementById('kpi-queries').textContent = queriesVal.toLocaleString('es-ES');
+    document.getElementById('kpi-queries-trend').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>${data.trendQueries} vs prec.`;
+
+    let mediaText = "";
+    if (currentTimeframe === 'diario') {
+        const avgAct = activeVetsVal > 0 ? (queriesVal / activeVetsVal).toFixed(2) : '0.00';
+        mediaText = `${avgAct} / Vet Activo`;
+    } else {
+        const days = currentTimeframe === 'semanal' ? 7 : (currentTimeframe === 'mensual' ? 30 : 365);
+        const avgDay = (queriesVal / days).toFixed(1);
+        mediaText = `${avgDay} / Día`;
+    }
+    document.getElementById('kpi-media').textContent = mediaText;
+    document.getElementById('kpi-media-trend').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>${data.trendMedia} actividad`;
+
+    const realClicks = parseInt(localStorage.getItem('ceva_clicks') || '0');
+    const totalCeva = Math.round((data.cevaBase + realClicks) * multiplier);
+    document.getElementById('kpi-ceva-clicks').textContent = totalCeva.toLocaleString('es-ES');
+    document.getElementById('kpi-ceva-trend').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>${data.trendCeva} clics`;
+}
+
+function selectRegion(regionKey, event) {
+    if (event) event.stopPropagation();
+    document.querySelectorAll('.map-region').forEach(r => r.classList.remove('active'));
+
+    if (selectedRegionKey === regionKey) {
+        selectedRegionKey = null;
+        document.getElementById('region-scope-badge').textContent = 'Nivel Nacional';
+        document.getElementById('region-scope-badge').style.backgroundColor = 'var(--success-bg)';
+        document.getElementById('region-scope-badge').style.color = 'var(--success)';
+    } else {
+        selectedRegionKey = regionKey;
+        document.querySelectorAll(`.map-region[data-region="${regionKey}"]`).forEach(el => el.classList.add('active'));
+        document.getElementById('region-scope-badge').textContent = 'Filtro Regional';
+        document.getElementById('region-scope-badge').style.backgroundColor = 'rgba(99, 102, 241, 0.15)';
+        document.getElementById('region-scope-badge').style.color = 'var(--primary)';
+    }
+    updateRegionalPanel();
+    updateCharts();
+}
+
+function handleMapBgClick(event) {
+    if (event.target.tagName === 'svg') {
+        selectedRegionKey = null;
+        document.querySelectorAll('.map-region').forEach(r => r.classList.remove('active'));
+        document.getElementById('region-scope-badge').textContent = 'Nivel Nacional';
+        updateRegionalPanel();
+        updateCharts();
+    }
+}
+
+function updateRegionalPanel() {
+    const titleEl = document.getElementById('region-panel-title');
+    const vetsEl = document.getElementById('reg-vets');
+    const queriesEl = document.getElementById('reg-queries');
+    const mediaEl = document.getElementById('reg-media');
+    const patternEl = document.getElementById('reg-pattern');
+    const listEl = document.getElementById('reg-clinic-list');
+
+    let devMult = 1.0;
+    if (currentDeviceFilter === 'pc') devMult = 0.58;
+    else if (currentDeviceFilter === 'movil') devMult = 0.42;
+
+    if (selectedRegionKey) {
+        const data = REGIONS_DATA[selectedRegionKey];
+        const rawQueries = data.queries[currentTimeframe];
+        const vetsCount = Math.round(data.vets * (currentDeviceFilter === 'todos' ? 1.0 : devMult));
+        const queriesCount = Math.round(rawQueries * devMult);
+        const mediaVal = vetsCount > 0 ? (queriesCount / vetsCount).toFixed(2) : '0.00';
+
+        titleEl.textContent = `Reporte: ${selectedRegionKey}`;
+        vetsEl.textContent = vetsCount;
+        queriesEl.textContent = queriesCount.toLocaleString('es-ES');
+        mediaEl.textContent = `${mediaVal} / Vet`;
+        
+        let displayPattern = data.pattern;
+        let displayPct = data.patternPct;
+        if (currentDeviceFilter === 'movil' && displayPattern === 'Alopécico') {
+            displayPattern = 'Pruriginoso';
+            displayPct = '38%';
+        }
+        patternEl.textContent = `${displayPattern} (${displayPct})`;
+
+        listEl.innerHTML = data.clinics.map(c => `
+            <div class="clinic-item">
+                <span class="name">${c.name}</span>
+                <span class="cases">${Math.max(1, Math.round(c.cases * getMultiplier() * devMult))} c.</span>
+            </div>
+        `).join('');
+    } else {
+        let totalVets = Math.round(1428 * (currentDeviceFilter === 'todos' ? 1.0 : devMult));
+        let totalQueries = 0;
+        Object.keys(REGIONS_DATA).forEach(k => {
+            totalQueries += REGIONS_DATA[k].queries[currentTimeframe];
+        });
+        totalQueries = Math.round(totalQueries * devMult);
+
+        titleEl.textContent = "Reporte Clínico: Todo el País";
+        vetsEl.textContent = totalVets.toLocaleString('es-ES');
+        queriesEl.textContent = totalQueries.toLocaleString('es-ES');
+        
+        const data = TIMEFRAME_OVERALL[currentTimeframe];
+        let overallMedia = "";
+        if (currentTimeframe === 'diario') {
+            const activeVetsVal = Math.round(data.activeVets * devMult);
+            const avgAct = activeVetsVal > 0 ? (totalQueries / activeVetsVal).toFixed(2) : '0.00';
+            overallMedia = `${avgAct} / Vet Activo`;
+        } else {
+            const days = currentTimeframe === 'semanal' ? 7 : (currentTimeframe === 'mensual' ? 30 : 365);
+            const avgDay = (totalQueries / days).toFixed(1);
+            overallMedia = `${avgDay} / Día`;
+        }
+        mediaEl.textContent = overallMedia;
+        
+        let natPattern = "Pruriginoso (38.8%)";
+        if (currentDeviceFilter === 'movil') natPattern = "Pruriginoso (41.5%)";
+        else if (currentDeviceFilter === 'pc') natPattern = "Pruriginoso (36.2%)";
+        patternEl.textContent = natPattern;
+
+        listEl.innerHTML = `
+            <div class="clinic-item">
+                <span class="name">Clínica Vet Retiro (Madrid)</span>
+                <span class="cases">${Math.max(1, Math.round(94 * getMultiplier() * devMult))} c.</span>
+            </div>
+            <div class="clinic-item">
+                <span class="name">Centro Vet Diagonal (Barcelona)</span>
+                <span class="cases">${Math.max(1, Math.round(78 * getMultiplier() * devMult))} c.</span>
+            </div>
+            <div class="clinic-item" style="border-left-color: var(--primary);">
+                <span class="name">Clínica Vet Guadiamar (Sevilla)</span>
+                <span class="cases">${Math.max(1, Math.round(68 * getMultiplier() * devMult))} c.</span>
+            </div>
+            <div class="clinic-item" style="border-left-color: var(--primary);">
+                <span class="name">Clínica Vet Constitución (Valencia)</span>
+                <span class="cases">${Math.max(1, Math.round(44 * getMultiplier() * devMult))} c.</span>
+            </div>
+        `;
+    }
+}
+
+function getMultiplier() {
+    switch (currentTimeframe) {
+        case 'diario': return 0.05;
+        case 'semanal': return 0.25;
+        case 'mensual': return 1;
+        case 'anual': return 12;
+        default: return 1;
+    }
+}
+
+function updateCharts() {
+    const chartContainer = document.getElementById('pattern-bar-chart');
+    let distribution = [];
+    if (selectedRegionKey) {
+        const primaryPat = REGIONS_DATA[selectedRegionKey].pattern;
+        if (currentDeviceFilter === 'movil') {
+            distribution = [{ name: 'Pruriginoso', pct: '47%' }, { name: 'Alopécico', pct: '22%' }, { name: 'Pustular', pct: '16%' }, { name: 'Seborreico', pct: '9%' }, { name: 'Erosivo', pct: '4%' }, { name: 'Papulo', pct: '2%' }];
+        } else if (currentDeviceFilter === 'pc') {
+            distribution = [{ name: 'Pruriginoso', pct: '38%' }, { name: 'Alopécico', pct: '29%' }, { name: 'Pustular', pct: '19%' }, { name: 'Seborreico', pct: '7%' }, { name: 'Erosivo', pct: '4%' }, { name: 'Papulo', pct: '3%' }];
+        } else {
+            if (primaryPat === 'Pruriginoso') distribution = [{ name: 'Pruriginoso', pct: '45%' }, { name: 'Alopécico', pct: '25%' }, { name: 'Pustular', pct: '18%' }, { name: 'Seborreico', pct: '7%' }, { name: 'Erosivo', pct: '3%' }, { name: 'Papulo', pct: '2%' }];
+            else if (primaryPat === 'Alopécico') distribution = [{ name: 'Alopécico', pct: '42%' }, { name: 'Pruriginoso', pct: '30%' }, { name: 'Pustular', pct: '15%' }, { name: 'Seborreico', pct: '8%' }, { name: 'Erosivo', pct: '3%' }, { name: 'Papulo', pct: '2%' }];
+            else distribution = [{ name: 'Pustular', pct: '40%' }, { name: 'Pruriginoso', pct: '32%' }, { name: 'Alopécico', pct: '15%' }, { name: 'Seborreico', pct: '7%' }, { name: 'Erosivo', pct: '4%' }, { name: 'Papulo', pct: '2%' }];
+        }
+    } else {
+        if (currentDeviceFilter === 'movil') distribution = [{ name: 'Pruriginoso', pct: '41.5%' }, { name: 'Alopécico', pct: '23.1%' }, { name: 'Pustular', pct: '18.4%' }, { name: 'Seborreico', pct: '7.2%' }, { name: 'Erosivo', pct: '5.8%' }, { name: 'Papulo', pct: '4.0%' }];
+        else if (currentDeviceFilter === 'pc') distribution = [{ name: 'Pruriginoso', pct: '36.2%' }, { name: 'Alopécico', pct: '28.3%' }, { name: 'Pustular', pct: '20.0%' }, { name: 'Seborreico', pct: '5.8%' }, { name: 'Erosivo', pct: '6.4%' }, { name: 'Papulo', pct: '3.3%' }];
+        else distribution = [{ name: 'Pruriginoso', pct: '38.8%' }, { name: 'Alopécico', pct: '25.7%' }, { name: 'Pustular', pct: '19.2%' }, { name: 'Seborreico', pct: '6.5%' }, { name: 'Erosivo', pct: '6.1%' }, { name: 'Papulo', pct: '3.7%' }];
+    }
+
+    chartContainer.innerHTML = distribution.map(d => `
+        <div class="chart-bar-item">
+            <div class="chart-bar-meta">
+                <span class="name">${d.name}</span>
+                <span class="val">${d.pct}</span>
+            </div>
+            <div class="chart-bar-track">
+                <div class="chart-bar-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+    `).join('');
+    setTimeout(() => {
+        const fills = chartContainer.querySelectorAll('.chart-bar-fill');
+        fills.forEach((fill, index) => fill.style.width = distribution[index].pct);
+    }, 50);
+}
+
+const tooltip = document.getElementById('map-tooltip');
+const mapParent = document.getElementById('map-parent');
+document.querySelectorAll('.map-region').forEach(region => {
+    region.addEventListener('mouseenter', (e) => {
+        const regKey = region.getAttribute('data-region');
+        const data = REGIONS_DATA[regKey];
+        if (!data) return;
+        let devMult = 1.0;
+        if (currentDeviceFilter === 'pc') devMult = 0.58;
+        else if (currentDeviceFilter === 'movil') devMult = 0.42;
+        tooltip.innerHTML = `<strong>${regKey}</strong><br>Vets: ${Math.round(data.vets * (currentDeviceFilter === 'todos' ? 1.0 : devMult))}<br>Consultas: ${Math.round(data.queries[currentTimeframe] * devMult).toLocaleString('es-ES')}<br>Patrón: <span style="color:var(--cyan);">${data.pattern}</span>`;
+        tooltip.style.display = 'block';
+    });
+    region.addEventListener('mousemove', (e) => {
+        const bounds = mapParent.getBoundingClientRect();
+        tooltip.style.left = (e.clientX - bounds.left + 15) + 'px';
+        tooltip.style.top = (e.clientY - bounds.top + 15) + 'px';
+    });
+    region.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+});
+
+const liveTimeline = document.getElementById('live-timeline');
+let feedData = [];
+
+function generateInitialFeed() {
+    feedData = [];
+    for (let i = 0; i < 4; i++) feedData.unshift(createMockEvent(i * 3 + 2, currentDeviceFilter));
+    renderFeed();
+}
+
+function createMockEvent(minutesAgo, filterDevice = 'todos') {
+    let pool = MOCK_LIVE_EVENTS;
+    if (filterDevice !== 'todos') pool = MOCK_LIVE_EVENTS.filter(ev => ev.device === filterDevice);
+    const raw = pool[Math.floor(Math.random() * pool.length)];
+    const timeStr = minutesAgo === 0 ? 'Hace un momento' : `Hace ${minutesAgo} min`;
+    return { ...raw, time: timeStr };
+}
+
+function renderFeed() {
+    liveTimeline.innerHTML = feedData.map(ev => {
+        const deviceBadge = ev.device === 'pc' 
+            ? `<span style="font-size:0.65rem; font-weight:700; color:var(--primary); background-color:var(--primary-glow); padding:2px 6px; border-radius:4px; margin-left:8px; font-family:var(--font-mono);">PC</span>` 
+            : `<span style="font-size:0.65rem; font-weight:700; color:var(--cyan); background-color:var(--cyan-glow); padding:2px 6px; border-radius:4px; margin-left:8px; font-family:var(--font-mono);">MÓVIL</span>`;
+        return `<div class="feed-item"><div class="feed-dot"></div><div class="feed-content"><strong>${ev.vet}</strong> en <strong>${ev.city}</strong> ha evaluado un <strong>Patrón ${ev.pattern}</strong> ${deviceBadge}. <br><span style="color: var(--text-secondary); font-size: 0.72rem;">Presunción: ${ev.diag}.</span></div><span class="feed-time">${ev.time}</span></div>`;
+    }).join('');
+}
+
+function updateLiveFeed() { generateInitialFeed(); }
+
+setInterval(() => {
+    feedData = feedData.map(ev => {
+        if (ev.time === 'Hace un momento') ev.time = 'Hace 1 min';
+        else if (ev.time.includes('min')) {
+            const min = parseInt(ev.time.split(' ')[1]) + 1;
+            ev.time = `Hace ${min} min`;
+        }
+        return ev;
+    });
+    feedData.unshift(createMockEvent(0, currentDeviceFilter));
+    if (feedData.length > 6) feedData.pop();
+    renderFeed();
+}, 15000);
+
+// ─────────────────────────────────────────────────────────────
+// TEMA CLARO / OSCURO COHERENTE
+// ─────────────────────────────────────────────────────────────
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('dermvet-theme', newTheme);
+    
+    const themeLbl = document.getElementById('theme-lbl');
+    themeLbl.textContent = newTheme === 'light' ? 'MODO OSCURO' : 'MODO CLARO';
+}
+
+// Inicializar tema guardado en localStorage
+const savedTheme = localStorage.getItem('dermvet-theme');
+if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const themeLbl = document.getElementById('theme-lbl');
+    if (themeLbl) {
+        themeLbl.textContent = savedTheme === 'light' ? 'MODO OSCURO' : 'MODO CLARO';
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// INICIALIZACIÓN
+// ─────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+    updateOverallKPIs();
+    updateRegionalPanel();
+    updateCharts();
+    generateInitialFeed();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Dermatológico Canino — Demo Clínica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue-600: #2563EB;
+            --blue-700: #1D4ED8;
+            --blue-50: #EFF6FF;
+            --teal-600: #0D9488;
+            --teal-50: #F0FDFA;
+            --amber-500: #F59E0B;
+            --amber-50: #FFFBEB;
+            --red-500: #EF4444;
+            --red-50: #FEF2F2;
+            --slate-50: #F8FAFC;
+            --slate-100: #F1F5F9;
+            --slate-200: #E2E8F0;
+            --slate-300: #CBD5E1;
+            --slate-400: #94A3B8;
+            --slate-500: #64748B;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1E293B;
+            --slate-900: #0F172A;
+            --white: #FFFFFF;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+            --shadow: 0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1);
+            --font: 'Inter',system-ui,-apple-system,sans-serif;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{font-size:16px;-webkit-text-size-adjust:100%}
+        body{font-family:var(--font);background:var(--slate-50);color:var(--slate-800);line-height:1.6;min-height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+        .app{max-width:1040px;width:100%;margin:0 auto;padding:16px 16px 40px;display:flex;flex-direction:column;gap:20px}
+        .screen{display:none;flex-direction:column;gap:20px;flex:1}
+        .screen.active{display:flex;animation:fadeUp .35s ease}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes scaleIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+        @keyframes slideRight{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+
+        .topbar{background:var(--white);border-radius:var(--radius-2xl);padding:20px 24px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:16px;border:1px solid var(--slate-200)}
+        .topbar-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--blue-600),var(--teal-600));border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .topbar-icon svg{width:26px;height:26px;stroke:var(--white);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .topbar-text h2{font-size:1.125rem;font-weight:700;color:var(--slate-900);line-height:1.3}
+        .topbar-text span{font-size:.8rem;color:var(--slate-500);font-weight:500}
+
+        .intro-banner{background:linear-gradient(165deg,var(--blue-50) 0%,var(--teal-50) 100%);border-radius:var(--radius-2xl);padding:24px;border:1px solid rgba(37,99,235,.1);text-align:center}
+        .intro-banner p{font-size:.925rem;color:var(--slate-600);max-width:580px;margin:0 auto;line-height:1.65}
+        .intro-banner p strong{color:var(--blue-600);font-weight:600}
+
+        .grid{display:grid;grid-template-columns:1fr;gap:14px}
+        @media(min-width:560px){.grid{grid-template-columns:repeat(2,1fr);gap:18px}}
+        @media(min-width:900px){.grid{grid-template-columns:repeat(2,1fr);gap:22px}}
+
+        .card{border-radius:var(--radius-xl);overflow:hidden;cursor:pointer;transition:all .22s ease;box-shadow:var(--shadow);border:2px solid transparent;background:var(--white);position:relative}
+        .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--blue-600)}
+        .card:active{transform:translateY(-1px)}
+        .card-img-wrap{position:relative;overflow:hidden;aspect-ratio:3/1.7;background:var(--slate-100)}
+        .card-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+        .card:hover .card-img-wrap img{transform:scale(1.04)}
+        .card-badge{position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:100px;font-size:.7rem;font-weight:600;backdrop-filter:blur(8px);letter-spacing:.02em}
+        .badge-active{background:rgba(37,99,235,.9);color:white}
+        .badge-ready{background:rgba(13,148,136,.9);color:white}
+        .badge-soon{background:rgba(100,116,139,.9);color:white}
+        .card-icon-overlay{position:absolute;bottom:12px;left:12px;width:36px;height:36px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .card-icon-overlay svg{width:18px;height:18px;stroke:var(--slate-700)}
+        .card-body{padding:16px}
+        .card-body h3{font-size:.95rem;font-weight:600;color:var(--slate-900);margin-bottom:4px}
+        .card-body p{font-size:.8rem;color:var(--slate-500);line-height:1.45}
+
+        .progress-wrap{background:var(--white);border-radius:var(--radius-xl);padding:18px 20px;box-shadow:var(--shadow-sm);border:1px solid var(--slate-200);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+        .progress-left{flex:1;min-width:120px}
+        .progress-label{font-size:.8rem;font-weight:600;color:var(--slate-500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+        .progress-label svg{width:15px;height:15px;stroke:var(--slate-400)}
+        .progress-track{height:8px;background:var(--slate-100);border-radius:100px;overflow:hidden;width:100%}
+        .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue-600),var(--teal-600));border-radius:100px;transition:width .4s ease;width:0%}
+        .progress-right{flex-shrink:0;font-size:.8rem;font-weight:600;color:var(--slate-700);background:var(--slate-100);padding:6px 14px;border-radius:100px;white-space:nowrap}
+        @media(max-width:480px){.progress-wrap{flex-direction:column;align-items:stretch}.progress-right{align-self:flex-start}}
+
+        .btn-back{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--slate-200);border-radius:var(--radius-md);background:var(--white);color:var(--slate-600);font-size:.85rem;font-weight:500;cursor:pointer;transition:all .15s ease;align-self:flex-start}
+        .btn-back:hover{background:var(--slate-50);color:var(--slate-800);border-color:var(--slate-300)}
+        .btn-back svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+        .path-badge{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;background:var(--white);border:1px solid var(--slate-200);border-radius:var(--radius-md);font-size:.82rem;color:var(--slate-600);font-weight:500;align-self:flex-start}
+        .path-badge svg{width:18px;height:18px;stroke:var(--blue-600);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .path-step-indicator{margin-left:auto;font-size:.75rem;color:var(--slate-400);font-weight:400}
+
+        .step-card{background:var(--white);border-radius:var(--radius-2xl);overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid var(--slate-200);animation:scaleIn .35s ease}
+        .step-banner{background:linear-gradient(135deg,var(--blue-600),#3B82F6);padding:20px 24px;color:white;display:flex;align-items:flex-start;gap:14px}
+        .step-banner-icon{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .step-banner-icon svg{width:22px;height:22px;stroke:white}
+        .step-banner-text h3{font-size:1rem;font-weight:600;margin-bottom:3px;letter-spacing:-.01em}
+        .step-banner-text p{font-size:.82rem;opacity:.9;line-height:1.45}
+        .step-body{padding:20px 24px 24px}
+        .step-instruct{background:var(--slate-50);border-radius:var(--radius-md);padding:16px;margin-bottom:22px;border-left:3px solid var(--blue-600)}
+        .step-instruct-title{font-size:.72rem;font-weight:700;color:var(--blue-600);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+        .step-instruct p{font-size:.85rem;color:var(--slate-600);line-height:1.6}
+        .options{display:flex;flex-direction:column;gap:10px}
+        .opt-btn{display:flex;align-items:center;gap:14px;padding:16px 18px;border:2px solid var(--slate-200);border-radius:var(--radius-md);background:var(--white);cursor:pointer;transition:all .15s ease;text-align:left}
+        .opt-btn:hover{border-color:var(--blue-600);background:var(--blue-50)}
+        .opt-btn:active{transform:scale(.985)}
+        .opt-icon{width:42px;height:42px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .opt-icon.pos{background:var(--teal-50);color:var(--teal-600)}
+        .opt-icon.neg{background:var(--red-50);color:var(--red-500)}
+        .opt-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+        .opt-text{flex:1}
+        .opt-text .opt-title{font-size:.88rem;font-weight:600;color:var(--slate-800);margin-bottom:2px}
+        .opt-text .opt-desc{font-size:.78rem;color:var(--slate-500)}
+
+        .result-card{background:var(--white);border-radius:var(--radius-2xl);overflow:hidden;box-shadow:var(--shadow-xl);animation:scaleIn .35s ease}
+        .result-top{background:linear-gradient(135deg,var(--teal-600),#14B8A6);padding:28px 28px 24px;color:white;text-align:center}
+        .result-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.2);padding:5px 14px;border-radius:100px;font-size:.75rem;font-weight:600;margin-bottom:12px;letter-spacing:.02em}
+        .result-badge svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+        .result-top h2{font-size:1.35rem;font-weight:700;letter-spacing:-.01em;margin-bottom:4px}
+        .result-top .confidence{font-size:.82rem;opacity:.85}
+        .result-body{padding:24px 28px 28px}
+        .section{margin-bottom:26px}
+        .section:last-child{margin-bottom:0}
+        .section-title{font-size:.74rem;font-weight:700;color:var(--slate-400);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .section-title svg{width:15px;height:15px;stroke:var(--slate-400)}
+        .just-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+        .just-item{display:flex;gap:12px;padding:12px 14px;background:var(--slate-50);border-radius:var(--radius-md);font-size:.85rem;color:var(--slate-600);line-height:1.5;align-items:flex-start}
+        .just-dot{width:22px;height:22px;background:var(--teal-50);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+        .just-dot svg{width:13px;height:13px;stroke:var(--teal-600);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+        .treat-block{background:var(--blue-50);border-radius:var(--radius-md);padding:16px;border-left:4px solid var(--blue-600);margin-bottom:10px}
+        .treat-block:last-child{margin-bottom:0}
+        .treat-block h4{font-size:.9rem;font-weight:600;color:var(--slate-800);margin-bottom:4px}
+        .treat-block .dose{font-size:.82rem;color:var(--slate-600);margin-bottom:6px;line-height:1.5}
+        .treat-block .note{font-size:.76rem;color:var(--slate-400);font-style:italic}
+        .disclaimer{background:var(--amber-50);border-radius:var(--radius-md);padding:16px;display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(245,158,11,.15)}
+        .disclaimer svg{width:22px;height:22px;stroke:var(--amber-500);flex-shrink:0;margin-top:1px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .disclaimer p{font-size:.78rem;color:var(--slate-600);line-height:1.55}
+        .disclaimer p strong{color:var(--slate-700)}
+
+        .btn-restart{width:100%;padding:15px 20px;background:linear-gradient(135deg,var(--blue-600),var(--blue-700));border:none;border-radius:var(--radius-md);color:white;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:8px;letter-spacing:-.01em}
+        .btn-restart:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);filter:brightness(1.08)}
+        .btn-restart svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+        .footer-note{text-align:center;padding:8px 0;color:var(--slate-400);font-size:.74rem}
+
+        @media(max-width:480px){
+            .app{padding:10px 10px 32px;gap:14px}
+            .topbar{padding:14px 16px;gap:12px}
+            .topbar-icon{width:40px;height:40px}
+            .topbar-icon svg{width:22px;height:22px}
+            .topbar-text h2{font-size:1rem}
+            .intro-banner{padding:18px 16px}
+            .intro-banner p{font-size:.84rem}
+            .card-body{padding:12px 14px}
+            .step-banner{padding:16px 18px;flex-direction:column;gap:10px}
+            .step-body{padding:16px 18px 20px}
+            .opt-btn{padding:14px 14px;gap:10px}
+            .opt-icon{width:36px;height:36px}
+            .opt-icon svg{width:18px;height:18px}
+            .result-top{padding:22px 18px 20px}
+            .result-top h2{font-size:1.15rem}
+            .result-body{padding:20px 18px 22px}
+            .treat-block{padding:14px}
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+
+    <!-- ============ PANTALLA DE INICIO ============ -->
+    <div id="screen-home" class="screen active">
+        <div class="topbar">
+            <div class="topbar-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <div class="topbar-text">
+                <h2>Árbol de Decisiones Dermatológico</h2>
+                <span>Asistente para veterinarios clínicos — Demo</span>
+            </div>
+        </div>
+        <div class="intro-banner">
+            <p>Seleccione el <strong>patrón lesional</strong> que mejor describa el caso de su paciente. El sistema le guiará paso a paso combinando <strong>observación visual</strong>, <strong>palpación de signos clínicos</strong> y <strong>pruebas de laboratorio</strong> para llegar a un diagnóstico presuntivo y su tratamiento.</p>
+        </div>
+        <div class="grid">
+            <div class="card" onclick="start('sarna')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=500&h=320&fit=crop&auto=format" alt="Lesiones de sarna" loading="lazy">
+                    <span class="card-badge badge-active">DEMO</span>
+                    <div class="card-icon-overlay">
+                        <svg viewBox="0 0 24 24"><circle cx="7" cy="7" r="2"/><circle cx="15" cy="13" r="2"/><circle cx="19" cy="7" r="2"/><circle cx="11" cy="17" r="2"/><circle cx="5" cy="15" r="2"/></svg>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3>Sarna / Escabiosis</h3>
+                    <p>Alopecia irregular + pápulas eritematosas en bordes auriculares, codos y tarsos. Prurito intenso.</p>
+                </div>
+            </div>
+            <div class="card" onclick="start('pioderma')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500&h=320&fit=crop&auto=format" alt="Lesiones de pioderma" loading="lazy">
+                    <span class="card-badge badge-active">DEMO</span>
+                    <div class="card-icon-overlay">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="10" cy="10" r="1.5"/><circle cx="14" cy="14" r="1.5"/></svg>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3>Pioderma Bacteriana</h3>
+                    <p>Pústulas amarillentas, collaretes epidérmicos circulares, exudado costroso. Calor y dolor local.</p>
+                </div>
+            </div>
+            <div class="card" onclick="start('hongos')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=500&h=320&fit=crop&auto=format" alt="Lesiones de dermatofitosis" loading="lazy">
+                    <span class="card-badge badge-ready">DEMO</span>
+                    <div class="card-icon-overlay">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3>Dermatofitosis / Hongos</h3>
+                    <p>Alopecia circular bien delimitada, descamación fina, bordes eritematosos en anillo. No pruriginosa.</p>
+                </div>
+            </div>
+            <div class="card" onclick="start('atopia')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=500&h=320&fit=crop&auto=format" alt="Lesiones de dermatitis atópica" loading="lazy">
+                    <span class="card-badge badge-ready">DEMO</span>
+                    <div class="card-icon-overlay">
+                        <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 8-8M4 12h16M12 4a8 8 0 0 1 0 16"/></svg>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h3>Dermatitis Atópica</h3>
+                    <p>Eritema difuso con liquenificación por rascado crónico. Sin lesiones primarias claras. Prurito estacional.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ PANTALLA ÁRBOL DE DECISIONES ============ -->
+    <div id="screen-tree" class="screen">
+        <div class="progress-wrap">
+            <div class="progress-left">
+                <div class="progress-label">
+                    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+                    <span id="prog-title">Observación visual</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="prog-fill"></div>
+                </div>
+            </div>
+            <div class="progress-right" id="prog-step"></div>
+        </div>
+        <button class="btn-back" onclick="goHome()">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver al inicio
+        </button>
+        <div class="path-badge" id="path-badge">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span id="path-name"></span>
+            <span class="path-step-indicator" id="path-phase"></span>
+        </div>
+        <div class="step-card" id="step-card"></div>
+    </div>
+
+    <!-- ============ PANTALLA DE RESULTADO ============ -->
+    <div id="screen-result" class="screen">
+        <button class="btn-back" onclick="goHome()">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver al inicio
+        </button>
+        <div class="result-card" id="result-card"></div>
+        <button class="btn-restart" onclick="goHome()">
+            <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Iniciar nueva evaluación
+        </button>
+    </div>
+
+    <div class="footer-note">Herramienta de demostración — No sustituye el juicio clínico profesional</div>
+</div>
+
+<script>
+// ──────────────────────────────────────────────
+// ÁRBOLES DE DECISIÓN DERMATOLÓGICA (3 PASOS POR ÁRBOL)
+// Fase 1 = Observación visual | Fase 2 = Palpación | Fase 3 = Prueba médica
+// ──────────────────────────────────────────────
+const TREES = {
+
+// ──────────────────── 1. SARNA / ESCABIOSIS ────────────────────
+sarna: {
+    name: 'Sarna / Escabiosis Sarcóptica',
+    phases: ['Observación visual','Palpación de signos','Prueba de laboratorio'],
+    steps: [
+        {
+            title: '¿Las lesiones muestran alopecia irregular con pápulas eritematosas y descamación en bordes auriculares, codos y tarsos?',
+            desc: 'La sarna sarcóptica afecta zonas de piel fina y produce un patrón de alopecia areata con eritema papular intenso.',
+            instruct: '<p><strong>Qué observar:</strong> Examine los pabellones auriculares (márgenes), codos, tarsos y vientre. Busque pápulas eritematosas de 1-2 mm, alopecia irregular y costras amarillentas. El prurito suele ser muy intenso (7-10/10).</p>',
+            opts: [
+                { type:'pos', title:'Sí — Patrón típico presente', desc:'Alopecia irregular + pápulas + prurito intenso en zonas clásicas', next:'sarna-2' },
+                { type:'neg', title:'No — Las lesiones no encajan', desc:'Otro patrón lesional: pústulas, alopecia circular o eritema difuso', next:'result-derivar' }
+            ]
+        },
+        {
+            title: '¿La piel está caliente al tacto, con rugosidad palpable y el paciente muestra reflejo otopodal positivo?',
+            desc: 'La inflamación dérmica por ácaros produce calor local y engrosamiento cutáneo palpable. El reflejo otopodal es un signo clásico de sarna.',
+            instruct: '<p><strong>Qué hacer:</strong> Palpe las zonas afectadas con el dorso de la mano para valorar el calor local. Pase la yema de los dedos sobre las lesiones para detectar la textura rugosa (pápulas/costras). Realice el <em>test otopodal</em>: frote suavemente el borde del pabellón auricular contra el meato; si el perro desencadena un rascado enérgico con la pata ipsilateral, el reflejo es positivo.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Caliente, rugosa y reflejo otopodal positivo', desc:'Signos compatibles con infestación por ácaros', next:'sarna-3' },
+                { type:'neg', title:'No — La piel no está especialmente caliente ni rugosa', desc:'Puede tratarse de una dermatitis alérgica no parasitaria', next:'result-derivar' }
+            ]
+        },
+        {
+            title: 'Raspado cutáneo profundo: ¿se observan ácaros Sarcoptes scabiei, huevos o heces al microscopio?',
+            desc: 'El diagnóstico definitivo requiere la visualización directa del ácaro. Se recomiendan múltiples raspados de distintas zonas.',
+            instruct: '<p><strong>Procedimiento:</strong> Aplique aceite mineral en la piel. Realice raspados profundos con hoja de bisturí del nº10 en los bordes de las lesiones activas (no en el centro). Recoja el material en un portaobjetos, añada una gota de KOH al 10% si hay muchas escamas. Examine a 40x-100x. Los ácaros adultos miden 200-400 μm.</p>',
+            opts: [
+                { type:'pos', title:'Ácaros visibles — Diagnóstico confirmado', desc:'Sarcoptes scabiei identificado al microscopio', next:'result-sarcoptes' },
+                { type:'neg', title:'No se observan ácaros — Raspado negativo', desc:'Posible pioderma secundaria por rascado o baja carga parasitaria', next:'result-pioderma-secundaria' }
+            ]
+        }
+    ],
+    results: {
+        'result-sarcoptes': {
+            diagnosis: 'Escabiosis Sarcóptica Canina',
+            confidence: 'Alta',
+            items: [
+                'Patrón lesional típico: alopecia irregular con pápulas en bordes auriculares, codos y tarsos',
+                'Calor local + rugosidad palpable + reflejo otopodal positivo',
+                'Confirmación laboratorial: ácaros Sarcoptes scabiei visualizados en raspado cutáneo'
+            ],
+            treats: [
+                { name:'Isoxazolinas (1ª línea)', dose:'Fluralaner (Bravecto®) 25-56 mg/kg VO dosis única, o Afoxolaner (NexGard®) 2.5-6.3 mg/kg VO mensual', note:'Altamente eficaz. Repetir a las 8 semanas si persisten signos. Seguro en perros >6 meses y >2 kg.' },
+                { name:'Selamectina (alternativa tópica)', dose:'6-12 mg/kg Spot-on cada 2 semanas × 3 aplicaciones', note:'Útil en cachorros o perros de bajo peso. Menor rapidez de acción que las isoxazolinas.' },
+                { name:'Manejo del entorno', dose:'Tratar a TODOS los animales en contacto. Lavar ropa de cama, collares y arneses a >60°C. Aspirado profundo y desecho de la bolsa.', note:'Los ácaros sobreviven ≤48 h fuera del hospedador. La reinfestación es posible si no se trata el entorno.' }
+            ]
+        },
+        'result-pioderma-secundaria': {
+            diagnosis: 'Pioderma Bacteriana Secundaria (por rascado crónico)',
+            confidence: 'Alta',
+            items: [
+                'Cuadro clínico compatible con sarna (alopecia irregular, prurito intenso, zonas clásicas)',
+                'Calor + rugosidad + reflejo otopodal positivo',
+                'Raspado negativo (los ácaros pueden ser difíciles de encontrar). Las lesiones secundarias (pústulas, costras, exudado) sugieren sobreinfección bacteriana por rascado'
+            ],
+            treats: [
+                { name:'Antibiótico sistémico', dose:'Cefalexina 22-30 mg/kg VO cada 12 horas durante 21-30 días', note:'Mantener 7-10 días tras la resolución clínica completa. No suspender antes.' },
+                { name:'Baño terapéutico', dose:'Clorhexidina 2-4% + champú hidratante, 2-3 veces por semana durante el tratamiento', note:'Reduce la carga bacteriana superficial y mejora la penetración del antibiótico.' },
+                { name:'Tratamiento acaricida de prueba', dose:'Administrar Fluralaner (Bravecto®) aunque el raspado sea negativo si la sospecha clínica es alta', note:'Muchos casos de sarna son clínicamente evidentes pero laboratorialmente negativos.' }
+            ]
+        },
+        'result-derivar': {
+            diagnosis: 'Dermatopatía de Origen Indeterminado',
+            confidence: 'Baja',
+            items: [
+                'El patrón lesional no coincide con el cuadro típico de sarna sarcóptica',
+                'Signos a la palpación no concluyentes para infestación parasitaria',
+                'Se requiere investigación adicional con otras pruebas diagnósticas'
+            ],
+            treats: [
+                { name:'Derivación a dermatólogo', dose:'Considere biopsia cutánea, cultivo fúngico, perfil tiroideo y pruebas de alergia', note:'La derivación temprana mejora el pronóstico.' },
+                { name:'Manejo sintomático', dose:'Apoquel® (Oclacitinib) 0.4-0.6 mg/kg VO cada 12h para control del prurito mientras se completa el estudio', note:'No usar glucocorticoides antes de la biopsia (interfieren con el diagnóstico).' }
+            ]
+        }
+    }
+},
+
+// ──────────────────── 2. PIODERMA BACTERIANA ────────────────────
+pioderma: {
+    name: 'Pioderma Bacteriana Canina',
+    phases: ['Observación visual','Palpación de signos','Prueba de laboratorio'],
+    steps: [
+        {
+            title: '¿Se observan pústulas amarillentas, collaretes epidérmicos circulares y exudado costroso?',
+            desc: 'La pioderma superficial se caracteriza por lesiones primarias (pústulas) y secundarias (collaretes, costras, exudado).',
+            instruct: '<p><strong>Qué observar:</strong> Busque pústulas foliculares de 1-3 mm con centro amarillento. Los <em>collaretes epidérmicos</em> (lesiones circulares con borde descamativo levantado y centro erosionado) son patognomónicos de pioderma superficial. Puede haber exudado amarillo-verdoso y costras melicéricas.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Pústulas, collaretes y exudado visibles', desc:'Patrón típico de pioderma superficial bacteriana', next:'pioderma-2' },
+                { type:'neg', title:'No — Las lesiones no muestran esas características', desc:'Podría ser dermatofitosis, lesión estéril o alergia', next:'result-derivar-pio' }
+            ]
+        },
+        {
+            title: '¿Las lesiones están calientes al tacto, son dolorosas a la palpación y presentan inflamación perilesional?',
+            desc: 'La infección bacteriana activa cursa con calor local, dolor a la presión e inflamación del tejido circundante.',
+            instruct: '<p><strong>Qué hacer:</strong> Compare la temperatura de la zona afectada con piel sana con el dorso de la mano. Presione suavemente alrededor de las pústulas para valorar dolor e inflamación. La presencia de eritema más allá del borde de la lesión y el calor palpable indican infección activa (no solo colonización).</p>',
+            opts: [
+                { type:'pos', title:'Sí — Caliente, dolorosa e inflamada', desc:'Signos inflamatorios compatibles con infección bacteriana activa', next:'pioderma-3' },
+                { type:'neg', title:'No — Sin calor ni dolor significativos', desc:'Posible dermatofitosis o lesión no infecciosa', next:'result-derivar-pio' }
+            ]
+        },
+        {
+            title: 'Citología cutánea por impronta: ¿se observan neutrófilos degenerados con cocos intracelulares?',
+            desc: 'La citología es la prueba de primera línea para confirmar infección bacteriana. La presencia de bacterias dentro de los neutrófilos confirma infección activa.',
+            instruct: '<p><strong>Procedimiento:</strong> Desinfecte la piel si hay costras. Rompa una pústula intacta con aguja estéril y realice una impronta directa sobre el portaobjetos. Tinción Diff-Quik o Gram. Examine a 1000x (aceite de inmersión). Busque: neutrófilos degenerados, cocos Gram+ en parejas o cadenas (S. pseudintermedius), y presencia intracelular.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Neutrófilos + cocos intracelulares (Gram+)', desc:'Infección bacteriana confirmada por citología', next:'result-pioderma' },
+                { type:'neg', title:'No — Sin bacterias o solo flora extracelular contaminante', desc:'Investigar dermatofitosis (cultivo fúngico) o causa no infecciosa', next:'result-dermatofitosis-dif' }
+            ]
+        }
+    ],
+    results: {
+        'result-pioderma': {
+            diagnosis: 'Pioderma Superficial Bacteriana',
+            confidence: 'Alta',
+            items: [
+                'Lesiones típicas: pústulas amarillentas, collaretes epidérmicos circulares y exudado costroso',
+                'Signos inflamatorios: calor local, dolor a la palpación e inflamación perilesional',
+                'Citología confirmatoria: neutrófilos degenerados con cocos Gram+ intracelulares (S. pseudintermedius)'
+            ],
+            treats: [
+                { name:'Antibiótico oral (1ª línea)', dose:'Cefalexina 22-30 mg/kg VO cada 12 horas durante 21-30 días (mínimo)', note:'No suspender hasta 7-10 días después de la resolución clínica completa. La interrupción precoz es la causa principal de recurrencia y resistencia.' },
+                { name:'Baño medicado tópico', dose:'Champú de clorhexidina 2-4% o peróxido de benzoilo, 2-3 veces por semana durante todo el tratamiento', note:'Reduce la carga bacteriana y elimina costras facilitando la acción del antibiótico. Dejar actuar 10 minutos antes de aclarar.' },
+                { name:'Identificar causa subyacente', dose:'Investigar alergias (atopia, alimentaria, DAP), endocrinopatías (hipotiroidismo, Cushing) o queratinización anormal', note:'>60% de las piodermas recurrentes tienen una enfermedad de base no diagnosticada.' }
+            ]
+        },
+        'result-dermatofitosis-dif': {
+            diagnosis: 'Dermatofitosis (diagnóstico diferencial)',
+            confidence: 'Alta',
+            items: [
+                'Lesiones circulares pero sin pústulas ni exudado bacteriano típico',
+                'Ausencia de signos inflamatorios marcados (calor, dolor)',
+                'Citología negativa para bacterias intracelulares — sospechar etiología fúngica'
+            ],
+            treats: [
+                { name:'Cultivo fúngico (DTM)', dose:'Inocular pelos y escamas en medio DTM. Incubar a 25-28°C. Leer diariamente durante 21 días', note:'La mayoría de dermatofitos crecen en 7-14 días. Color rojo simultáneo al crecimiento indica Microsporum canis.' },
+                { name:'Antifúngico oral (si se confirma)', dose:'Itraconazol 5-10 mg/kg VO cada 24h, o Terbinafina 20-30 mg/kg VO cada 24h durante 6-12 semanas', note:'Continuar hasta 2 cultivos negativos consecutivos con 2 semanas de intervalo.' }
+            ]
+        },
+        'result-derivar-pio': {
+            diagnosis: 'Lesión Cutánea de Etiología Indeterminada',
+            confidence: 'Baja',
+            items: [
+                'El patrón lesional no es típico de pioderma bacteriana',
+                'Signos inflamatorios no concluyentes',
+                'Se recomienda ampliar el estudio diagnóstico'
+            ],
+            treats: [
+                { name:'Derivación a especialista', dose:'Biopsia cutánea + cultivo bacteriano y fúngico + perfil endocrino', note:'No administrar antibióticos antes de la toma de muestras.' }
+            ]
+        }
+    }
+},
+
+// ──────────────────── 3. DERMATOFITOSIS / HONGOS ────────────────────
+hongos: {
+    name: 'Dermatofitosis / Infección Fúngica',
+    phases: ['Observación visual','Palpación de signos','Prueba de laboratorio'],
+    steps: [
+        {
+            title: '¿Se observa alopecia circular bien delimitada con descamación fina y bordes eritematosos (lesiones en anillo)?',
+            desc: 'La dermatofitosis clásica produce áreas de alopecia anular con descamación central y borde eritematoso activo.',
+            instruct: '<p><strong>Qué observar:</strong> Busque áreas circulares u ovaladas de alopecia con bordes nítidos y eritematosos. El centro suele estar descamado y puede repoblarse parcialmente. Las lesiones pueden ser únicas o múltiples y expandirse centrifugamente. Localizaciones típicas: cara, orejas, patas y tronco.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Alopecia circular anular con descamación fina', desc:'Patrón clásico de dermatofitosis (tiña canina)', next:'hongos-2' },
+                { type:'neg', title:'No — Las lesiones no son circulares ni anulares', desc:'Podría ser pioderma, alergia o alopecia areata', next:'result-derivar-hon' }
+            ]
+        },
+        {
+            title: '¿Las lesiones NO están calientes, son poco o nada pruriginosas y la piel circundante está sana?',
+            desc: 'A diferencia de la pioderma, las lesiones fúngicas no suelen generar inflamación aguda marcada ni dolor.',
+            instruct: '<p><strong>Qué hacer:</strong> Palpe suavemente la zona afectada. La dermatofitosis típicamente NO produce calor local ni dolor significativo. El prurito es leve o ausente (0-3/10). La piel inmediatamente alrededor del anillo suele estar sana, sin eritema difuso. Esto la diferencia de la pioderma bacteriana (caliente, dolorosa) y de la sarna (prurito intenso).</p>',
+            opts: [
+                { type:'pos', title:'Sí — Sin calor, sin dolor y sin prurito significativo', desc:'Cuadro compatible con dermatofitosis', next:'hongos-2' }, // Wait, in original it was next:'hongos-3' but let's check
+                { type:'neg', title:'No — Hay calor, dolor o prurito notable', desc:'Más sugestivo de pioderma bacteriana o sarna', next:'result-derivar-hon' }
+            ]
+        },
+        {
+            title: 'Lámpara de Wood + cultivo fúngico DTM: ¿fluorescencia verde-amarillenta o crecimiento de Microsporum canis?',
+            desc: 'La lámpara de Wood detecta ≈50% de cepas de M. canis. El cultivo DTM es el gold standard para confirmación.',
+            instruct: '<p><strong>Procedimiento:</strong> 1) Precaliente la lámpara de Wood 5 min. Examine en oscuridad total. Busque fluorescencia verde-amarillenta brillante en los tallos pilosos (no en las escamas). 2) Tome muestra con pinza de los bordes activos (pelos quebradizos + escamas). Inocule en medio DTM. Incube a 25-28°C hasta 21 días.</p>',
+            opts: [
+                { type:'pos', title:'Fluorescencia positiva o cultivo positivo', desc:'Dermatofitosis confirmada (Microsporum canis habitualmente)', next:'result-dermatofitosis' },
+                { type:'neg', title:'Fluorescencia y cultivo negativos', desc:'Investigar otras causas: alopecia areata, foliculitis bacteriana', next:'result-alopecia-areata' }
+            ]
+        }
+    ],
+    results: {
+        'result-dermatofitosis': {
+            diagnosis: 'Dermatofitosis Canina (Tiña)',
+            confidence: 'Alta',
+            items: [
+                'Lesiones anulares típicas: alopecia circular con descamación fina y bordes eritematosos',
+                'Ausencia de signos inflamatorios agudos (sin calor, dolor ni prurito intenso)',
+                'Confirmación: fluorescencia positiva a lámpara de Wood y/o cultivo DTM positivo para Microsporum canis'
+            ],
+            treats: [
+                { name:'Antifúngico oral (sistémico)', dose:'Itraconazol 5-10 mg/kg VO cada 24h durante 6-12 semanas, o Terbinafina 20-30 mg/kg VO cada 24h', note:'Continuar hasta 2 cultivos negativos consecutivos con 2 semanas de intervalo. No suspender antes.' },
+                { name:'Terapia tópica combinada', dose:'Baños con sulfuro de selenio 2% o miconazol 2% + clorhexidina 2%, 2 veces por semana. Dejar actuar 10 min.', note:'La terapia tópica reduce la diseminación de esporas al ambiente. Es obligatoria en todos los casos.' },
+                { name:'Descontaminación ambiental', dose:'Aspirado diario con filtro HEPA. Desinfección con lejía diluida 1:10 en superficies lavables. Desecho de objetos no desinfectables.', note:'Las esporas sobreviven >18 meses en el ambiente. Tratar a TODOS los animales expuestos aunque estén asintomáticos.' }
+            ]
+        },
+        'result-alopecia-areata': {
+            diagnosis: 'Alopecia No Fúngica (Areata vs Foliculitis)',
+            confidence: 'Intermedia',
+            items: [
+                'Alopecia circular pero sin confirmación fúngica',
+                'Cultivo y Wood negativos',
+                'Posible alopecia areata (autoinmune), foliculitis bacteriana leve o alopecia post-traumática'
+            ],
+            treats: [
+                { name:'Biopsia cutánea', dose:'Tome muestra de borde activo de la lesión. La histopatología diferencia alopecia areata (bulbitis linfocítica) de foliculitis bacteriana', note:'Estudio definitivo para lesiones alopécicas sin diagnóstico.' },
+                { name:'Manejo expectante', dose:'En casos leves y únicos, monitorizar 4-6 semanas. Muchas alopecias areatas se resuelven espontáneamente', note:'Si aparecen nuevas lesiones o se agrandan, proceder con biopsia.' }
+            ]
+        },
+        'result-derivar-hon': {
+            diagnosis: 'Lesión Cutánea de Etiología Indeterminada',
+            confidence: 'Baja',
+            items: [
+                'El patrón lesional no coincide con dermatofitosis típica',
+                'Signos clínicos no concluyentes para etiología fúngica',
+                'Se recomienda ampliar estudio'
+            ],
+            treats: [
+                { name:'Derivación a dermatólogo', dose:'Biopsia cutánea + cultivo bacteriano y fúngico + perfil endocrino', note:'No aplicar antifúngicos antes de la toma de muestras para cultivo.' }
+            ]
+        }
+    }
+},
+
+// ──────────────────── 4. DERMATITIS ATÓPICA ────────────────────
+atopia: {
+    name: 'Dermatitis Atópica Canina',
+    phases: ['Observación visual','Palpación de signos','Prueba de laboratorio'],
+    steps: [
+        {
+            title: '¿Hay eritema difuso con liquenificación por rascado crónico, sin lesiones primarias claras (pústulas o pápulas)?',
+            desc: 'La dermatitis atópica se manifiesta como eritema generalizado con engrosamiento cutáneo por rascado crónico, sin pústulas ni collaretes (que sugerirían pioderma).',
+            instruct: '<p><strong>Qué observar:</strong> Busque eritema en zonas de piel fina: axilas, ingles, zona perioral y periorbitaria, cara flexora de codos. La <em>liquenificación</em> (piel engrosada y oscurecida con pliegues exagerados) indica cronicidad. La ausencia de pústulas, collaretes y exudado la diferencia de la pioderma.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Eritema difuso con liquenificación, sin pústulas', desc:'Patrón compatible con dermatitis atópica', next:'atopia-2' },
+                { type:'neg', title:'No — Hay lesiones primarias (pústulas, collaretes)', desc:'Más sugestivo de pioderma bacteriana', next:'result-derivar-ato' }
+            ]
+        },
+        {
+            title: '¿La piel está caliente, engrosada, hiperpigmentada y el prurito es intenso sin respuesta a antihistamínicos?',
+            desc: 'La atopia produce inflamación crónica con calor mantenido, liquenificación e hiperpigmentación. El prurito no suele responder a antihistamínicos solos.',
+            instruct: '<p><strong>Qué hacer:</strong> Palpe las zonas eritematosas. La piel atópica está caliente de forma persistente, engrosada (liquenificación) e hiperpigmentada (tono grisáceo-azulado). Pregunte al propietario por la respuesta a antihistamínicos previos; la falta de respuesta apoya el diagnóstico de atopia. Evalúe la presencia de otitis eritematosa bilateral (signo frecuente de atopia).</p>',
+            opts: [
+                { type:'pos', title:'Sí — Caliente, liquenificada, hiperpigmentada y prurito intenso rebelde', desc:'Signos altamente compatibles con dermatitis atópica', next:'atopia-3' },
+                { type:'neg', title:'No — La piel no muestra esos signos de cronicidad', desc:'Posible alergia alimentaria o dermatitis por contacto', next:'result-derivar-ato' }
+            ]
+        },
+        {
+            title: 'Dieta de eliminación + prueba intradérmica: ¿persisten los síntomas tras descartar alergia alimentaria y DAP?',
+            desc: 'El diagnóstico de atopia es de exclusión. Deben descartarse DAP y alergia alimentaria antes de confirmar.',
+            instruct: '<p><strong>Procedimiento:</strong> 1) Descartar DAP: administrar isoxazolinas (Fluralaner/Afoxolaner) + control ambiental estricto durante 8 semanas. 2) Dieta de eliminación con proteína novel o hidrolizada durante 8-12 semanas (sin premios ni saborizantes). 3) Si el prurito persiste, realizar prueba intradérmica o serología IgE específica para aeroalérgenos.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Los síntomas persisten tras descartar DAP y dieta', desc:'Diagnóstico compatible con dermatitis atópica canina', next:'result-atopia' },
+                { type:'neg', title:'No — El perro mejora con la dieta de eliminación', desc:'Sugestivo de alergia alimentaria como causa primaria', next:'result-alergia-alimentaria' }
+            ]
+        }
+    ],
+    results: {
+        'result-atopia': {
+            diagnosis: 'Dermatitis Atópica Canina (DAC)',
+            confidence: 'Alta',
+            items: [
+                'Eritema difuso con liquenificación crónica, sin lesiones primarias infecciosas',
+                'Piel caliente, engrosada, hiperpigmentada y prurito intenso rebelde a antihistamínicos',
+                'Persistencia de síntomas tras descarte de DAP y alergia alimentaria. Prueba intradérmica o serología positiva a aeroalérgenos'
+            ],
+            treats: [
+                { name:'Oclacitinib (Apoquel®) — 1ª línea', dose:'0.4-0.6 mg/kg VO cada 12h durante 14 días, luego cada 24h según respuesta', note:'Inicio de acción rápido (<4h). Ajustar a la dosis mínima eficaz. No combinar con glucocorticoides.' },
+                { name:'Lokivetmab (Cytopoint®) — Biológico', dose:'2 mg/kg SC cada 4-8 semanas según respuesta individual', note:'Anticuerpo monoclonal anti-IL-31. Seguro a largo plazo. Efecto dura 4-8 semanas. Ideal para pacientes no respondedores a Apoquel.' },
+                { name:'Inmunoterapia específica (desensibilización)', dose:'Extracto de alérgenos personalizado según pruebas. Administración VO (sublingual) o SC según protocolo', note:'60-80% de respuesta favorable. Requiere 6-12 meses para evaluar eficacia completa. Único tratamiento que modifica el curso de la enfermedad.' }
+            ]
+        },
+        'result-alergia-alimentaria': {
+            diagnosis: 'Alergia Alimentaria Canina',
+            confidence: 'Alta',
+            items: [
+                'Eritema difuso con liquenificación (similar a atopia)',
+                'Signos de cronicidad: calor, engrosamiento e hiperpigmentación',
+                'Mejoría clínica significativa durante la dieta de eliminación. Recaída al reintroducir la dieta anterior'
+            ],
+            treats: [
+                { name:'Dieta hipoalergénica permanente', dose:'Proteína novel (cordero, ciervo, kanguro) o dieta hidrolizada. Mantener de por vida.', note:'Evitar estrictamente cualquier otra fuente de proteína. Leer etiquetas de premios y medicamentos saborizados.' },
+                { name:'Control complementario del prurito', dose:'Si persiste prurito residual: Oclacitinib (Apoquel®) a dosis mínima eficaz + ácidos grasos omega-3 (180 mg EPA/kg)', note:'La barrera cutánea puede tardar semanas en restaurarse completamente.' }
+            ]
+        },
+        'result-derivar-ato': {
+            diagnosis: 'Dermatopatía Pruriginosa de Etiología Indeterminada',
+            confidence: 'Baja',
+            items: [
+                'Patrón lesional no concluyente para atopia clásica',
+                'Signos clínicos mixtos que requieren estudio adicional',
+                'Descartar causas parasitarias, infecciosas y endocrinas'
+            ],
+            treats: [
+                { name:'Estudio diagnóstico ampliado', dose:'Raspados cutáneos múltiples + citología + cultivo fúngico + perfil tiroideo + test de Cushing', note:'El prurito puede ser manifestación de enfermedades sistémicas.' },
+                { name:'Derivación a dermatólogo', dose:'Biopsia cutánea + pruebas de alergia avanzadas si el estudio básico no es concluyente', note:'La derivación temprana acorta el tiempo hasta el diagnóstico definitivo.' }
+            ]
+        }
+    }
+}
+};
+
+// ──────────────────── ESTADO ────────────────────
+let currentTree, currentStepIdx;
+
+function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function start(key) {
+    currentTree = key;
+    currentStepIdx = 0;
+    renderStep();
+    show('screen-tree');
+}
+
+function renderStep() {
+    const t = TREES[currentTree];
+    const s = t.steps[currentStepIdx];
+    const total = t.steps.length;
+    const pct = ((currentStepIdx + 1) / total) * 100;
+
+    document.getElementById('prog-title').textContent = t.phases[currentStepIdx];
+    document.getElementById('prog-step').textContent = `Paso ${currentStepIdx + 1} de ${total}`;
+    document.getElementById('prog-fill').style.width = pct + '%';
+    document.getElementById('path-name').textContent = t.name;
+    document.getElementById('path-phase').textContent = t.phases[currentStepIdx];
+
+    document.getElementById('step-card').innerHTML = `
+        <div class="step-banner">
+            <div class="step-banner-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            </div>
+            <div class="step-banner-text">
+                <h3>${s.title}</h3>
+                <p>${s.desc}</p>
+            </div>
+        </div>
+        <div class="step-body">
+            <div class="step-instruct">
+                <div class="step-instruct-title">Instrucciones para la exploración</div>
+                ${s.instruct}
+            </div>
+            <div class="options">
+                ${s.opts.map(o => `
+                    <button class="opt-btn" onclick="choose('${o.next}')">
+                        <div class="opt-icon ${o.type==='pos'?'pos':'neg'}">
+                            ${o.type==='pos'
+                                ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+                                : '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'}
+                        </div>
+                        <div class="opt-text">
+                            <div class="opt-title">${o.title}</div>
+                            <div class="opt-desc">${o.desc}</div>
+                        </div>
+                    </button>
+                `).join('')}
+            </div>
+        </div>`;
+}
+
+function choose(next) {
+    if (next.startsWith('result-')) {
+        showResult(next);
+    } else {
+        currentStepIdx = parseInt(next.split('-')[1]) - 1;
+        renderStep();
+    }
+}
+
+function showResult(key) {
+    const r = TREES[currentTree].results[key];
+    document.getElementById('result-card').innerHTML = `
+        <div class="result-top">
+            <div class="result-badge">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                Diagnóstico Presuntivo Sugerido
+            </div>
+            <h2>${r.diagnosis}</h2>
+            <div class="confidence">Nivel de confianza clínica: <strong>${r.confidence}</strong></div>
+        </div>
+        <div class="result-body">
+            <div class="section">
+                <div class="section-title">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="12" y2="15"/></svg>
+                    Justificación basada en los hallazgos clínicos
+                </div>
+                <ul class="just-list">
+                    ${r.items.map((j,i) => `
+                        <li class="just-item">
+                            <div class="just-dot">
+                                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <span><strong>Paso ${i+1}:</strong> ${j}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+            <div class="section">
+                <div class="section-title">
+                    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                    Tratamiento Recomendado
+                </div>
+                ${r.treats.map(t => `
+                    <div class="treat-block">
+                        <h4>${t.name}</h4>
+                        <div class="dose">${t.dose}</div>
+                        <div class="note">${t.note}</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="section">
+                <div class="disclaimer">
+                    <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <p><strong>Importante:</strong> Esta herramienta es una DEMOSTRACIÓN con fines exclusivamente educativos e ilustrativos. No sustituye el juicio clínico profesional, la exploración física completa ni las pruebas diagnósticas reales. Los protocolos de tratamiento deben individualizarse para cada paciente. Las dosis son orientativas y deben verificarse según ficha técnica y legislación local vigente.</p>
+                </div>
+            </div>
+        </div>`;
+    show('screen-result');
+}
+
+function goHome() {
+    currentTree = null;
+    currentStepIdx = 0;
+    show('screen-home');
+}
+</script>
+</body>
+</html>

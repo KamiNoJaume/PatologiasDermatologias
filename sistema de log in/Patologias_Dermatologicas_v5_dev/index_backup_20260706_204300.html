@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DermVet Pro — Terminal de Diagnóstico Dermatológico Canino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Tema Oscuro Premium Clínico */
+            --bg-base: #060913;
+            --bg-surface: #0f1626;
+            --bg-surface-elevated: #172237;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glowing: rgba(99, 102, 241, 0.35);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --primary: #6366f1; /* Indigo */
+            --primary-hover: #4f46e5;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            
+            --success: #10b981; /* Esmeralda */
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --success-border: rgba(16, 185, 129, 0.25);
+            
+            --warning: #f59e0b; /* Ámbar */
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            --warning-border: rgba(245, 158, 11, 0.25);
+            
+            --danger: #f43f5e; /* Coral/Rosa */
+            --danger-bg: rgba(244, 63, 94, 0.12);
+            --danger-border: rgba(244, 63, 94, 0.25);
+            
+            --cyan: #06b6d4;
+            --cyan-bg: rgba(6, 182, 212, 0.1);
+            --cyan-border: rgba(6, 182, 212, 0.25);
+            
+            --shadow-main: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        [data-theme="light"] {
+            /* Tema Claro Clínico Premium */
+            --bg-base: #f3f4f6;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #f9fafb;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-glowing: rgba(99, 102, 241, 0.2);
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            
+            --success: #059669;
+            --success-bg: rgba(5, 150, 105, 0.08);
+            --success-border: rgba(5, 150, 105, 0.18);
+            
+            --warning: #d97706;
+            --warning-bg: rgba(217, 119, 6, 0.08);
+            --warning-border: rgba(217, 119, 6, 0.18);
+            
+            --danger: #e11d48;
+            --danger-bg: rgba(225, 29, 72, 0.08);
+            --danger-border: rgba(225, 29, 72, 0.18);
+            
+            --cyan: #0891b2;
+            --cyan-bg: rgba(8, 145, 178, 0.08);
+            --cyan-border: rgba(8, 145, 178, 0.18);
+            
+            --shadow-main: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ──────────────── Reset & Globales ──────────────── */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* Contenedor Base */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* ──────────────── 1. App Header ──────────────── */
+        .app-header {
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--cyan));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px var(--primary-glow);
+            flex-shrink: 0;
+        }
+
+        .brand-logo svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .brand-text h1 {
+            font-size: 1.25rem;
+            line-height: 1.2;
+            font-weight: 850;
+        }
+
+        .brand-text p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle-btn {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .theme-toggle-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .admin-config-btn {
+            background-color: var(--primary-glow);
+            border: 1px solid var(--border-glowing);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .admin-config-btn:hover {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 12px var(--primary);
+        }
+
+        .admin-config-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.2;
+        }
+
+        /* ──────────────── 2. Main Layout (Centrado y Limpio) ──────────────── */
+        .main-layout {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px 20px 50px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ──────────────── 3. Panel de Analíticas (Deslizable desde la derecha) ──────────────── */
+        .admin-drawer {
+            position: fixed;
+            top: 0;
+            right: -520px;
+            width: 500px;
+            height: 100%;
+            background-color: var(--bg-surface);
+            border-left: 1px solid var(--border-color);
+            box-shadow: var(--shadow-main);
+            z-index: 200;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+        }
+
+        .admin-drawer.open {
+            right: 0;
+        }
+
+        @media (max-width: 540px) {
+            .admin-drawer {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        .drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 190;
+            display: none;
+        }
+
+        .drawer-backdrop.open {
+            display: block;
+        }
+
+        /* Filtro de Analíticas */
+        .analytics-filter-bar {
+            display: flex;
+            background-color: var(--bg-surface-elevated);
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .kpi-card span.label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .kpi-card span.value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        .kpi-card span.change {
+            font-size: 0.72rem;
+            color: var(--success);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        /* Listas y Progress Bars de Analíticas */
+        .chart-section {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chart-section h4 {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .chart-list-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chart-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .chart-item-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .chart-item-meta span.name {
+            color: var(--text-secondary);
+        }
+
+        .chart-item-meta span.val {
+            font-family: var(--font-mono);
+        }
+
+        .chart-bar-track {
+            height: 6px;
+            background-color: var(--bg-base);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--cyan));
+            border-radius: 100px;
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        /* ──────────────── 4. Screen Home (Pathology Cards) ──────────────── */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
+            border: 1px solid var(--border-glowing);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-main);
+        }
+
+        .hero-banner h2 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .hero-banner p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 760px;
+            margin: 0 auto;
+            line-height: 1.55;
+        }
+
+        .grid-diseases {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-diseases {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid-diseases {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .disease-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            box-shadow: var(--shadow-main);
+        }
+
+        .disease-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 24px var(--primary-glow);
+        }
+
+        .card-image-container {
+            position: relative;
+            aspect-ratio: 16/10;
+            overflow: hidden;
+            background-color: var(--bg-surface-elevated);
+        }
+
+        .card-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .disease-card:hover .card-image-container img {
+            transform: scale(1.05);
+        }
+
+        .card-overlay-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(6, 182, 212, 0.8);
+            color: white;
+        }
+
+        .card-overlay-badge.orange {
+            background-color: rgba(245, 158, 11, 0.8);
+        }
+
+        .card-overlay-badge.red {
+            background-color: rgba(244, 63, 94, 0.8);
+        }
+
+        .card-overlay-badge.gray {
+            background-color: rgba(100, 116, 139, 0.8);
+        }
+
+        .card-icon-overlay {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            width: 34px;
+            height: 34px;
+            background-color: rgba(15, 22, 38, 0.85);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-icon-overlay svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--cyan);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .card-details {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-details h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-details p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* ──────────────── 5. Screen Tree (Consulta / Flujo Centrado) ──────────────── */
+        .diagnostic-grid {
+            max-width: 680px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .progress-indicator-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .prog-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .prog-label-row span.ph {
+            color: var(--cyan);
+        }
+
+        .prog-label-row span.st {
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .pruritus-track {
+            height: 6px;
+            background-color: var(--bg-base);
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .pruritus-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 100px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .step-container-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-main);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-header-banner {
+            background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+            color: white;
+            padding: 20px;
+        }
+
+        .step-header-banner h3 {
+            font-size: 1rem;
+            line-height: 1.45;
+            font-weight: 700;
+        }
+
+        .step-header-banner p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        /* Foto de Referencia dentro de la Consulta */
+        .step-reference-photo-wrap {
+            aspect-ratio: 16/9;
+            width: 100%;
+            overflow: hidden;
+            background-color: var(--bg-surface-elevated);
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .step-reference-photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Silueta de perro y esquemas embebidos como referencia */
+        .step-reference-diagram-wrap {
+            width: 100%;
+            padding: 20px;
+            background-color: #03060c;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hud-dog-silhouette {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            color: var(--text-secondary);
+            opacity: 0.75;
+        }
+
+        .microscope-lens {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px double var(--border-color);
+            background-color: #010307;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .microscope-content-svg {
+            width: 70%;
+            height: auto;
+            color: var(--text-secondary);
+        }
+
+        .step-body-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .step-clinical-instruction {
+            background-color: var(--bg-surface-elevated);
+            border-left: 4px solid var(--cyan);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .step-clinical-instruction p strong {
+            color: var(--text-primary);
+        }
+
+        .diagnostic-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-button {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-surface-elevated);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            outline: none;
+        }
+
+        .option-button:hover {
+            border-color: var(--primary);
+            transform: scale(1.015);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .option-button:active {
+            transform: scale(0.995);
+        }
+
+        .option-btn-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .option-btn-icon.pos {
+            background-color: var(--success-bg);
+            color: var(--success);
+            border: 1px solid var(--success-border);
+        }
+
+        .option-btn-icon.neg {
+            background-color: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid var(--danger-border);
+        }
+
+        .option-btn-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+        }
+
+        .option-btn-texts {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .option-btn-texts span.title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .option-btn-texts span.desc {
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+        }
+
+        /* ──────────────── 6. Screen Result (Alineación Centrada) ──────────────── */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Columna Izquierda: Reporte Diagnóstico */
+        .result-summary-col {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-main);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .report-header-banner {
+            background: linear-gradient(135deg, var(--success-border) 0%, rgba(3,6,12,0.85) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .report-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background-color: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: var(--success);
+            border-radius: 100px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 14px;
+        }
+
+        .report-badge svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2.5;
+        }
+
+        .report-header-banner h2 {
+            font-size: 1.35rem;
+            color: var(--text-primary);
+        }
+
+        .report-confidence-gauge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .report-confidence-gauge span.val {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 700;
+            background-color: var(--bg-base);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .report-body-clinical {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .result-section-title {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-section-title svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .timeline-clinical-facts {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .fact-step-item {
+            display: flex;
+            gap: 12px;
+            background-color: var(--bg-surface-elevated);
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--success);
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+
+        .fact-step-num {
+            font-family: var(--font-mono);
+            color: var(--success);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .actions-report-panel {
+            padding: 16px 20px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-action-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-action-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .btn-action-secondary {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-action-secondary:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .btn-action-secondary svg, .btn-action-primary svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Columna Derecha: Detalles del Tratamiento & Prescripción */
+        .result-details-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .treatment-card-tabs {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-main);
+        }
+
+        .tabs-header-nav {
+            display: flex;
+            background-color: var(--bg-surface-elevated);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-nav-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 14px;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-nav-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-nav-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background-color: rgba(99, 102, 241, 0.04);
+        }
+
+        .tab-content-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 240px;
+        }
+
+        .treatment-prescription-block {
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .treatment-prescription-block h4 {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .treatment-prescription-block .dose-text {
+            font-size: 0.85rem;
+            color: var(--cyan);
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .treatment-prescription-block .note-text {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        /* Cuadro de texto de notas clínicas auto-generadas */
+        .clinical-notes-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            box-shadow: var(--shadow-main);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .clinical-notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clinical-notes-card textarea {
+            width: 100%;
+            height: 120px;
+            background-color: var(--bg-surface-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+
+        .clinical-notes-card textarea:focus {
+            border-color: var(--primary);
+            color: var(--text-primary);
+        }
+
+        .disclaimer-card-info {
+            background-color: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .disclaimer-card-info svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--warning);
+            fill: none;
+            flex-shrink: 0;
+            stroke-width: 2;
+        }
+
+        .disclaimer-card-info p {
+            font-size: 0.74rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .disclaimer-card-info p strong {
+            color: var(--text-primary);
+        }
+
+        /* ──────────────── 7. Modal Módulo Bloqueado ──────────────── */
+        .locked-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 250;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: var(--shadow-main);
+            display: none;
+            animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .locked-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 240;
+            display: none;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: translate(-50%, -45%) scale(0.95); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* ──────────────── 8. App Footer ──────────────── */
+        .app-footer {
+            background-color: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            padding: 16px;
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
+        .screen-view {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .screen-view.active {
+            display: flex;
+            animation: fadeUp 0.35s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-back-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-surface-elevated);
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            align-self: flex-start;
+            margin-bottom: 8px;
+            width: fit-content;
+        }
+        .btn-back-home:hover {
+            color: var(--text-primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
+        }
+        .btn-back-home svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .header-stats {
+                display: none;
+            }
+        }
+        .header-stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .header-stat-box span.lbl {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .header-stat-box span.val {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 800;
+            font-family: var(--font-mono);
+        }
+
+        /* Imprimir receta */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .app-header, .btn-back-home, .actions-report-panel, .app-footer, .theme-toggle-btn, .tabs-header-nav, .clinical-notes-header button, .disclaimer-card-info, .admin-config-btn {
+                display: none !important;
+            }
+            .main-layout {
+                display: block !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .diagnostic-grid {
+                max-width: 100% !important;
+            }
+            .result-grid {
+                display: block !important;
+            }
+            .result-summary-col {
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                margin-bottom: 20px !important;
+                page-break-inside: avoid;
+            }
+            .result-details-col {
+                display: block !important;
+            }
+            .treatment-card-tabs {
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                margin-bottom: 20px !important;
+                page-break-inside: avoid;
+            }
+            .tab-content-panel {
+                display: block !important;
+                min-height: auto !important;
+                padding: 0 20px 20px !important;
+            }
+            .clinical-notes-card {
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            .clinical-notes-card textarea {
+                border: none !important;
+                color: black !important;
+                background: white !important;
+            }
+            .report-header-banner {
+                background: #f3f4f6 !important;
+                color: black !important;
+                border-bottom: 1px solid #ddd !important;
+            }
+            .report-confidence-gauge span.val {
+                background: #fff !important;
+                border: 1px solid #ddd !important;
+            }
+            .fact-step-item {
+                background: #f9fafb !important;
+                border: 1px solid #ddd !important;
+                border-left: 3px solid #059669 !important;
+            }
+            .treatment-prescription-block {
+                background: #f9fafb !important;
+                border: 1px solid #ddd !important;
+                border-left: 4px solid #4f46e5 !important;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- APP HEADER -->
+    <header class="app-header">
+        <div class="brand">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            </div>
+            <div class="brand-text">
+                <h1>DermVet Pro</h1>
+                <p>Asistente Clínico de Diagnóstico Dermatológico Canino</p>
+            </div>
+        </div>
+        
+        <div class="header-stats">
+            <div class="header-stat-box">
+                <span class="lbl">VETS REGISTRADOS</span>
+                <span class="val" style="color: var(--primary);">1,428</span>
+            </div>
+            <div class="header-stat-box">
+                <span class="lbl">BASE DE DATOS</span>
+                <span class="val">2026.1v</span>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <button class="theme-toggle-btn" onclick="toggleTheme()">
+                <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span id="theme-label">TEMA OSCURO</span>
+            </button>
+            <a href="stats.html" class="admin-config-btn" style="text-decoration: none;" title="Panel de Analíticas y Estadísticas (MKT)">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Analíticas</span>
+            </a>
+        </div>
+    </header>
+
+
+
+    <!-- MODAL PATRÓN EN DESARROLLO / CALIBRACIÓN -->
+    <div class="locked-backdrop" id="locked-backdrop" onclick="closeLockedModal()"></div>
+    <div class="locked-modal" id="locked-modal">
+        <div style="text-align:center;">
+            <div style="width:54px; height:54px; border-radius:50%; background:var(--warning-bg); border:1px solid var(--warning-border); display:inline-flex; align-items:center; justify-content:center; margin-bottom:14px; color: var(--warning);">
+                <svg viewBox="0 0 24 24" style="width:26px; height:26px; stroke:currentColor; fill:none; stroke-width:2;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 id="locked-pattern-title" style="font-size:1.15rem; margin-bottom:6px; color: var(--text-primary);">Módulo en Calibración</h3>
+            <p id="locked-pattern-desc" style="font-size:0.8rem; color:var(--text-secondary); line-height:1.5; margin-bottom:20px;">
+                Este módulo de diagnóstico se encuentra actualmente en fase de validación clínica de su base de datos.
+            </p>
+            <button class="btn-action-primary" style="width:100%;" onclick="closeLockedModal()">Entendido</button>
+        </div>
+    </div>
+
+    <!-- MAIN WORKSPACE CONTENT -->
+    <div class="main-layout">
+        
+        <!-- ============ SCREEN 1: INICIO (SELECCIÓN DE PATRÓN DERMATOLÓGICO) ============ -->
+        <div id="screen-home" class="screen-view active">
+            <div class="hero-banner">
+                <h2>Árbol de Decisiones Dermatológicas</h2>
+                <p>Seleccione el <strong>patrón dermatológico primario</strong> que mejor describa la lesión de su paciente. El asistente clínico le guiará a través de la inspección de signos, exploración física de contacto y pruebas laboratoriales correspondientes.</p>
+            </div>
+            
+            <div class="grid-diseases" id="diseases-grid">
+                <!-- Generado dinámicamente -->
+            </div>
+        </div>
+
+        <!-- ============ SCREEN 2: ÁRBOL DE DECISIONES DE CONSULTA CENTRADO ============ -->
+        <div id="screen-tree" class="screen-view">
+            
+            <!-- Botón atrás -->
+            <button class="btn-back-home" onclick="goHome()">
+                <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                Cancelar evaluación y volver
+            </button>
+
+            <div class="diagnostic-grid">
+                
+                <!-- Barra de Progreso de Fase -->
+                <div class="progress-indicator-card">
+                    <div class="prog-label-row">
+                        <span id="prog-title" class="ph">Inspección Visual</span>
+                        <span id="prog-step" class="st">PASO 1 DE 3</span>
+                    </div>
+                    <div class="pruritus-track">
+                        <div class="pruritus-fill" id="prog-fill" style="width: 33%;"></div>
+                    </div>
+                </div>
+
+                <!-- Panel de decisión conteniendo la pregunta y la foto/diagrama clínico de referencia -->
+                <div class="step-container-card" id="step-card">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ SCREEN 3: RESULTADOS E INFORME MÉDICO ============ -->
+        <div id="screen-result" class="screen-view">
+            <!-- Botón atrás -->
+            <button class="btn-back-home" onclick="goHome()">
+                <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+                Volver al panel inicial
+            </button>
+
+            <div class="result-grid">
+                
+                <!-- COLUMNA IZQUIERDA: INFORME DE DIAGNÓSTICO -->
+                <div class="result-summary-col">
+                    <div class="report-header-banner">
+                        <div class="report-badge">
+                            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            Diagnóstico Presuntivo Asistido
+                        </div>
+                        <h2 id="result-diagnosis-title">Escabiosis Sarcóptica Canina</h2>
+                        
+                        <div class="report-confidence-gauge">
+                            <span class="lbl" style="font-size: 0.72rem; color: var(--text-secondary); text-transform: uppercase;">Confianza:</span>
+                            <span class="val text-success" id="result-confidence-val">ALTA (96%)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="report-body-clinical">
+                        <div class="result-section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                            Hallazgos Clínicos Justificativos
+                        </div>
+                        
+                        <div class="timeline-clinical-facts" id="result-facts-container">
+                            <!-- Dinámico -->
+                        </div>
+                    </div>
+                    
+                    <div class="actions-report-panel">
+                        <button class="btn-action-primary" onclick="window.print()">
+                            <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                            Imprimir Receta e Informe
+                        </button>
+                        <button class="btn-action-secondary" onclick="copyClinicalRecord()">
+                            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            Copiar Expediente a Historial
+                        </button>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: TRATAMIENTO Y PRESCRIPCIÓN POR PESTAÑAS -->
+                <div class="result-details-col">
+                    <div class="treatment-card-tabs">
+                        <div class="tabs-header-nav" id="treatment-tabs-nav">
+                            <!-- Dinámico -->
+                        </div>
+                        
+                        <div class="tab-content-panel" id="treatment-tab-content">
+                            <!-- Dinámico -->
+                        </div>
+                    </div>
+                    
+                    <!-- NOTAS CLÍNICAS AUTO-GENERADAS -->
+                    <div class="clinical-notes-card">
+                        <div class="clinical-notes-header">
+                            <span class="result-section-title" style="margin-bottom:0;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                Notas Clínicas Generadas (Editable)
+                            </span>
+                        </div>
+                        <textarea id="clinical-notes-textarea" spellcheck="false"></textarea>
+                    </div>
+
+                    <!-- AVISO LEGAL CLÍNICO -->
+                    <div class="disclaimer-card-info">
+                        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        <p><strong>Aviso de Demostración:</strong> Este terminal simula el diagnóstico clínico asistido. Los datos farmacológicos y de dosis son de carácter estrictamente educativo. El veterinario debe confrontar la prescripción con el vademécum oficial y la sintomatología clínica real antes de prescribir.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ==================== SCRIPT DE LOGICA Y DE MOCKS ==================== -->
+<script>
+// Variables de control de estado global
+let currentTree = null;
+let currentStepIdx = 0;
+const configHideDev = false;
+
+// ─────────────────────────────────────────────────────────────
+// BASE DE DATOS DE PATRONES CLÍNICOS (ESTRUCTURA DE DATOS)
+// ─────────────────────────────────────────────────────────────
+const TREES = {
+
+// ──────────────────── 1. PATRÓN ALOPÉCICO ────────────────────
+alopécico: {
+    name: 'Patrón Alopécico Canino',
+    phases: ['Observación Visual','Exploración Física','Confirmación Laboratorio'],
+    steps: [
+        {
+            title: '¿La pérdida de pelo se presenta en placas circulares y bien delimitadas con descamación fina?',
+            desc: 'La alopecia anular localizada es típica de dermatofitosis (tiña) y demodicosis inicial, mientras que la alopecia simétrica difusa sugiere endocrinopatía.',
+            instruct: '<p><strong>Examen clínico:</strong> Inspeccione el hocico, extremidades y lomo. Diferencie si la pérdida de pelo forma "anillos" de bordes limpios o si es difusa bilateral en tronco.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Alopecia circular delimitada', desc:'Presencia de parches redondos alopécicos con escamas superficiales.', next:'alopécico-2' },
+                { type:'neg', title:'No — Alopecia difusa o simétrica', desc:'Alopecia generalizada, simétrica o con patrón endocrino (tronco respetando extremidades).', next:'result-alopecia-endocrina' }
+            ],
+            type: 'visual',
+            img: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=500&h=320&fit=crop&auto=format'
+        },
+        {
+            title: '¿La piel alopécica carece de calor local palpable y el paciente no presenta prurito activo?',
+            desc: 'La dermatofitosis clásica no cursa con inflamación calorífica aguda ni rascado severo (prurito 0-3/10), a diferencia de la foliculitis bacteriana.',
+            instruct: '<p><strong>Prueba física:</strong> Palpe el centro y borde de la lesión circular alopécica. Pregunte al propietario si hay rascado frecuente de esa zona.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Placa fría y prurito nulo/leve', desc:'Lesión no eritematosa inflamatoria, compatible con dermatofitos.', next:'alopécico-3' },
+                { type:'neg', title:'No — Piel caliente y prurito notable', desc:'Sugestivo de pioderma bacteriana secundaria o sarna demodécica infectada.', next:'result-derivar-alo' }
+            ],
+            type: 'diagram'
+        },
+        {
+            title: 'Test de Wood o Cultivo DTM: ¿se aprecia fluorescencia verde brillante o cambio de color en el medio?',
+            desc: 'La fluorescencia verdosa en tallos pilosos confirma Microsporum canis (50-60% de cepas). El cultivo DTM es el diagnóstico confirmatorio estándar.',
+            instruct: '<p><strong>Procedimiento:</strong> Realice examen en oscuridad total con Lámpara de Wood. Si es negativo, siembre raspado periférico y pelos rotos en tubo DTM.</p>',
+            opts: [
+                { type:'pos', title:'Positivo — Fluorescencia o cultivo positivo', desc:'Diagnóstico fúngico confirmado.', next:'result-dermatofitosis' },
+                { type:'neg', title:'Negativo — Sin fluorescencia ni crecimiento fúngico', desc:'Evaluación de foliculitis estéril o alopecia areata.', next:'result-alopecia-areata' }
+            ],
+            type: 'micro'
+        }
+    ],
+    results: {
+        'result-dermatofitosis': {
+            diagnosis: 'Dermatofitosis Fúngica (Tiña Canina)',
+            confidence: 'Alta (94%)',
+            items: [
+                'Lesiones alopécicas anulares delimitadas con descamación fina.',
+                'Ausencia de eritema inflamatorio (lesiones frías al tacto) y prurito ausente.',
+                'Confirmación laboratorial por fluorescencia activa Wood o cultivo DTM positivo.'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Itraconazol oral', dose:'5-10 mg/kg VO cada 24 horas durante 4-6 semanas', note:'Administrar con alimento graso. Mantener hasta obtener cultivo de control negativo.' },
+                    { name:'Terbinafina (Alternativa)', dose:'20-30 mg/kg VO cada 24 horas', note:'Gran penetración folicular. Utilizar si se prefiere evitar antifúngicos azólicos.' }
+                ],
+                'topico': [
+                    { name:'Champú de Enilconazol o Miconazol 2%', dose:'Baño completo 2 veces por semana, dejando actuar 10 minutos', note:'Obligatorio para evitar la diseminación de esporas (fómites) en el entorno.' }
+                ],
+                'entorno': [
+                    { name:'Limpieza de superficies', dose:'Aspirado diario y aplicación de lejía diluida 1:10 en zonas de descanso', note:'Las esporas de Microsporum canis son altamente resistentes en el ambiente.' }
+                ]
+            }
+        },
+        'result-alopecia-areata': {
+            diagnosis: 'Alopecia Areata (Origen Autoinmune)',
+            confidence: 'Intermedia (70%)',
+            items: [
+                'Alopecia localizada circular limpia.',
+                'Ausencia de calor, costras, pústulas o prurito.',
+                'Descarte fúngico de tiña (Wood y cultivos negativos).'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Derivación para biopsia cutánea', dose:'Punch de 6mm de folículos activos periféricos', note:'La histopatología mostrará infiltración linfocitaria bulbar (peribulbitis en "enjambre de abejas").' }
+                ],
+                'topico': [
+                    { name:'Pipetas dermocosméticas reestructurantes', dose:'Aplicación semanal (Allerderm®)', note:'Favorece la hidratación y nutrición del estrato córneo para estimular el rebrote folicular.' }
+                ],
+                'entorno': [
+                    { name:'Monitorización clínica de repoblación', dose:'Control fotográfico cada 21 días', note:'Muchas alopecias areatas o de origen post-vacunal se resuelven espontáneamente sin fármacos.' }
+                ]
+            }
+        },
+        'result-alopecia-endocrina': {
+            diagnosis: 'Sospecha de Alopecia Endocrina / Sistémica',
+            confidence: 'Intermedia (75%)',
+            items: [
+                'Pérdida de pelo con patrón simétrico bilateral, respetando cabeza y extremidades.',
+                'Ausencia de prurito primario y signos inflamatorios.',
+                'Piel adelgazada con comedones y posible hiperpigmentación.'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Perfil Hormonal Completo', dose:'Determinación de T4 libre, TSH y prueba de estimulación con ACTH', note:'Descartar Hipotiroidismo canino o Cushing como causas primarias de la atrofia folicular.' }
+                ],
+                'topico': [
+                    { name:'Champú queratomodulador suave', dose:'Baño cada 10 días para remover descamación y detritos grasos secundarios', note:'Previene la colonización oportuna de levaduras Malassezia.' }
+                ],
+                'entorno': [
+                    { name:'Control de dieta y peso corporal', dose:'Evaluación nutricional de grasas esenciales', note:'Los pacientes hipotiroideos suelen presentar letargo y ganancia de peso concomitantes.' }
+                ]
+            }
+        },
+        'result-derivar-alo': {
+            diagnosis: 'Foliculitis Infecciosa Mixta',
+            confidence: 'Baja (40%)',
+            items: [
+                'Alopecia de patrón circular pero asociada a prurito y calor dérmico.',
+                'Sospecha de demodicosis complicada o foliculitis estafilocócica.',
+                'Requiere análisis citológicos adicionales.'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Citología de raspado profundo y cinta adhesiva', dose:'Examen a 400x para buscar ácaros Demodex canis', note:'El ácaro folicular Demodex causa alopecia circular que se complica rápidamente con pioderma bacteriana.' },
+                    { name:'Antibioterapia empírica temporal', dose:'Cefalexina 22 mg/kg VO cada 12 horas si hay pápulas/pústulas satélite', note:'Trata la foliculitis bacteriana concurrente que distorsiona el patrón alopécico.' }
+                ],
+                'topico': [
+                    { name:'Lavados localizados con clorhexidina 3%', dose:'Aplicación diaria en la placa afectada', note:'Disminuye la carga bacteriana folicular sin enmascarar posibles cultivos fúngicos tardíos.' }
+                ],
+                'entorno': [
+                    { name:'Prevención antiparasitaria sistémica', dose:'Isoxazolinas mensuales (Afoxolaner/Fluralaner)', note:'Excelente espectro contra demodicosis concomitante.' }
+                ]
+            }
+        }
+    }
+},
+
+// ──────────────────── 2. PATRÓN PUSTULAR-VESICULAR ────────────────────
+pustular_vesicular: {
+    name: 'Patrón Pustular-Vesicular',
+    phases: ['Observación Visual','Exploración Física','Confirmación Laboratorio'],
+    steps: [
+        {
+            title: '¿Se aprecian pústulas amarillentas foliculares o collaretes epidérmicos circulares con borde descamativo?',
+            desc: 'La pústula es la lesión primaria de la infección bacteriana dérmica, mientras que el collarete epidérmico representa una pústula rota curada.',
+            instruct: '<p><strong>Examen clínico:</strong> Explore ingles, axilas y abdomen. Diferencie pústulas frágiles bacterianas de vesículas de contenido claro (autoinmunes o víricas).</p>',
+            opts: [
+                { type:'pos', title:'Sí — Pústulas/Collaretes presentes', desc:'Lesiones clásicas compatibles con foliculitis superficial estafilocócica.', next:'pustular_vesicular-2' },
+                { type:'neg', title:'No — Vesículas claras o costras gruesas solas', desc:'Lesiones ulceradas o vesiculosas no centradas en folículos.', next:'result-derivar-pustular' }
+            ],
+            type: 'visual',
+            img: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500&h=320&fit=crop&auto=format'
+        },
+        {
+            title: '¿La exploración física de contacto revela calor local marcado y dolor a la palpación de las pústulas?',
+            desc: 'La foliculitis bacteriana superficial activa genera una respuesta inflamatoria focal con dolor leve al tacto e hipertermia regional.',
+            instruct: '<p><strong>Prueba física:</strong> Compare la temperatura con una zona de piel sana. Ejerza presión leve sobre las pústulas para notar molestia.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Calor local y dolor activo', desc:'Signos compatibles con infección bacteriana activa aguda.', next:'pustular_vesicular-3' },
+                { type:'neg', title:'No — Lesiones indoloras/frías', desc:'Falta de calor inflamatorio agudo. Sospechar pústulas estériles o pénfigo.', next:'result-pemphigus-foliaceus' }
+            ],
+            type: 'diagram'
+        },
+        {
+            title: 'Citología por impronta: ¿se identifican neutrófilos degenerados con cocos bacterianos intracelulares?',
+            desc: 'La visualización de bacterias en el citoplasma de los neutrófilos confirma infección bacteriana activa. Si se observan células acantolíticas, apunta a pénfigo.',
+            instruct: '<p><strong>Procedimiento:</strong> Rompa una pústula intacta con aguja de 21G, presione un portaobjetos sobre el pus, tiña con Diff-Quik y observe a 1000x.</p>',
+            opts: [
+                { type:'pos', title:'Cocos intracelulares visibles', desc:'Confirmación de pioderma superficial bacteriana.', next:'result-pioderma' },
+                { type:'neg', title:'Ausencia de bacterias o células acantolíticas solas', desc:'Sospecha de pústula estéril de origen autoinmune.', next:'result-pemphigus-foliaceus' }
+            ],
+            type: 'micro'
+        }
+    ],
+    results: {
+        'result-pioderma': {
+            diagnosis: 'Pioderma Superficial Bacteriana',
+            confidence: 'Alta (95%)',
+            items: [
+                'Presencia de pústulas foliculares y collaretes epidérmicos en áreas de piel fina.',
+                'Hipertermia local y dolor inflamatorio a la palpación.',
+                'Citología con neutrófilos degenerados repletos de cocos Gram+ (Staphylococcus pseudintermedius).'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Cefalexina vía oral', dose:'15-30 mg/kg VO cada 12 horas durante 21-30 días', note:'Tratar hasta 7-10 días después de la resolución clínica completa de los collaretes. No interrumpir antes.' },
+                    { name:'Cefovecina SC (Alternativo)', dose:'8 mg/kg SC dosis única (Convenia®)', note:'Alternativa inyectable de larga duración si la obediencia del tratamiento oral falla.' }
+                ],
+                'topico': [
+                    { name:'Champú de Clorhexidina al 3%', dose:'Baños cada 3 días frotando las zonas inguinales y abdominales', note:'Efecto antiséptico directo que acorta los días de tratamiento antibiótico oral.' }
+                ],
+                'entorno': [
+                    { name:'Investigación etiológica primaria', dose:'Estudio de alergias o atopia si la pioderma recurre frecuentemente', note:'La pioderma es casi siempre secundaria a un daño de barrera subyacente.' }
+                ]
+            }
+        },
+        'result-pemphigus-foliaceus': {
+            diagnosis: 'Pénfigo Foliáceo (Enfermedad Autoinmune)',
+            confidence: 'Alta (90%)',
+            items: [
+                'Pústulas amarillentas y collaretes secos localizados en cara, hocico y almohadillas.',
+                'Ausencia de calor bacteriano agudo y dolor típico.',
+                'Citología libre de bacterias con presencia masiva de neutrófilos no degenerados y células acantolíticas.'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Prednisona (Terapia inmunosupresora)', dose:'2-3 mg/kg VO cada 24 horas inicialmente hasta remisión', note:'Efecto inmunosupresor. Requiere monitorización estricta y analíticas de control regulares.' },
+                    { name:'Azatioprina (Coadyuvante)', dose:'1-2 mg/kg VO cada 24 horas para ahorro de corticoides', note:'No utilizar en gatos. Tarda semanas en ejercer su máximo efecto terapéutico.' }
+                ],
+                'topico': [
+                    { name:'Champú de fitosfingosina o calmante', dose:'Baños suaves cada 7 días para control de descamación', note:'No utilizar champús antisépticos agresivos que resequen el estrato córneo vulnerable.' }
+                ],
+                'entorno': [
+                    { name:'Evitar exposición solar directa', dose:'Reducción de radiación UV en horas centrales del día', note:'La radiación ultravioleta exacerba la acantólisis inmunomediada del pénfigo.' }
+                ]
+            }
+        },
+        'result-derivar-pustular': {
+            diagnosis: 'Dermatitis Pustulocostrosa Atípica (Derivación)',
+            confidence: 'Baja (35%)',
+            items: [
+                'Vesículas/pústulas de gran tamaño no asociadas a folículos.',
+                'Falta de signos citológicos concluyentes en frotis.',
+                'Sospecha de dermatosis sensible al zinc o pústulas secundarias a fármacos.'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Programar Biopsia Cutánea', dose:'Toma de muestras por punch de 6-8mm de lesiones activas', note:'Única prueba definitiva para clasificar pénfigos profundos o dermatosis metabólicas.' }
+                ],
+                'topico': [
+                    { name:'Champú queratolítico suave de azufre y ácido salicílico', dose:'Baño semanal para remover descamación dura', note:'Mantiene la piel protegida sin interferir con la histopatología.' }
+                ],
+                'entorno': [
+                    { name:'Suplementación con Zinc y Ácidos Grasos', dose:'Suplemento nutricional diario', note:'Descartar deficiencia relativa de zinc, común en razas nórdicas.' }
+                ]
+            }
+        }
+    }
+},
+
+// ──────────────────── 3. PATRÓN PRURIGINOSO ────────────────────
+pruriginoso: {
+    name: 'Patrón Pruriginoso Canino',
+    phases: ['Observación Visual','Exploración Física','Confirmación Laboratorio'],
+    steps: [
+        {
+            title: '¿Las lesiones eritematosas se localizan preferentemente en pabellones auriculares, codos y tarsos?',
+            desc: 'La distribución anatómica del prurito y lesiones es clave: sarna sarcóptica afecta bordes auriculares y codos, mientras que atopia prefiere axilas, ingles y cara.',
+            instruct: '<p><strong>Examen clínico:</strong> Inspeccione la cara interna y márgenes de las orejas, los codos del perro y la cara ventral. Observe si hay eritema o pápulas eritematosas.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Márgenes auriculares y codos afectados', desc:'Distribución clásica de sarna sarcóptica (escabiosis).', next:'pruriginoso-2' },
+                { type:'neg', title:'No — Afecta axilas, ingles o espacios interdigitales', desc:'Distribución clásica de Dermatitis Atópica o alergia alimentaria.', next:'result-dermatitis-atopica-excl' }
+            ],
+            type: 'visual',
+            img: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=500&h=320&fit=crop&auto=format'
+        },
+        {
+            title: '¿Al frotar el margen auricular del paciente se desencadena el test de reflejo otopodal positivo?',
+            desc: 'El test otopodal es altamente sugestivo de sarna sarcóptica activa debido a la hipersensibilidad al movimiento del ácaro en la oreja.',
+            instruct: '<p><strong>Prueba física:</strong> Sujete el pabellón auricular y frote el margen suavemente con el dedo pulgar. Si la pata trasera ipsilateral realiza movimientos de rascado, el test es positivo.</p>',
+            opts: [
+                { type:'pos', title:'Sí — Reflejo otopodal positivo', desc:'Signo clínico altamente confirmatorio de infestación acaricida.', next:'pruriginoso-3' },
+                { type:'neg', title:'No — Reflejo otopodal negativo', desc:'Ausencia de rascado reflejo. Sugiere atopia u otitis alérgica pura.', next:'result-dermatitis-atopica-excl' }
+            ],
+            type: 'diagram'
+        },
+        {
+            title: 'Raspado cutáneo profundo: ¿se visualizan ácaros Sarcoptes scabiei o sus huevos al microscopio?',
+            desc: 'El raspado cutáneo confirma el ácaro, pero debido a la baja carga en perros y la respuesta inmune, suele dar falsos negativos hasta en el 50% de los casos.',
+            instruct: '<p><strong>Procedimiento:</strong> Aplique aceite mineral. Raspe profundamente con hoja de bisturí hasta sangrado capilar fino. Observe a 100x con KOH.</p>',
+            opts: [
+                { type:'pos', title:'Ácaros visibles — Confirmado', desc:'Visualización del ácaro S. scabiei. Diagnóstico confirmatorio.', next:'result-sarcoptes-confirmado' },
+                { type:'neg', title:'Ácaros no visibles — Raspado negativo', desc:'Ausencia de parásitos en muestra. Se sugiere tratamiento terapéutico de prueba.', next:'result-sarna-empirica' }
+            ],
+            type: 'micro'
+        }
+    ],
+    results: {
+        'result-sarcoptes-confirmado': {
+            diagnosis: 'Sarna Sarcóptica (Escabiosis) Confirmada',
+            confidence: 'Alta (96%)',
+            items: [
+                'Alopecia costrosa localizada en márgenes auriculares y codos.',
+                'Reflejo otopodal positivo e hipertermia regional.',
+                'Confirmación directa por visualización microscópica de Sarcoptes scabiei.'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Isoxazolinas acaricidas', dose:'Fluralaner (Bravecto®) o Afoxolaner (NexGard®) dosis comercial estándar', note:'Tratamiento altamente eficaz de dosis única o mensual. Resuelve la infestación rápidamente.' },
+                    { name:'Selamectina Spot-on (Alternativo)', dose:'6 mg/kg vía tópica cada 15 días, 3 aplicaciones', note:'Indicado en cachorros o en pacientes con historial de convulsiones sensibles a isoxazolinas.' }
+                ],
+                'topico': [
+                    { name:'Champú antiséptico queratolítico', dose:'Baños semanales con champú calmante de avena o clorhexidina al 2%', note:'Favorece el desprendimiento de costras y reduce el prurito secundario.' }
+                ],
+                'entorno': [
+                    { name:'Lavado de camas y accesorios', dose:'Lavar todos los textiles en contacto con el perro a >60ºC', note:'Evita la reinfestación pasiva por ácaros caídos al ambiente.' }
+                ]
+            }
+        },
+        'result-sarna-empirica': {
+            diagnosis: 'Escabiosis Clínica (Raspado Negativo)',
+            confidence: 'Intermedia (80%)',
+            items: [
+                'Signos clínicos e historia totalmente compatibles con sarna sarcóptica.',
+                'Reflejo otopodal positivo.',
+                'Raspado cutáneo negativo (común por baja densidad parasitaria o autoinmunidad).'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Tratamiento acaricida de prueba (Bravecto/NexGard)', dose:'Administrar 1 dosis completa de Isoxazolina vía oral', note:'Por protocolo dermatológico, ante alta sospecha de sarna con raspado negativo, debe realizarse tratamiento de prueba antes de diagnosticar alergias.' },
+                    { name:'Cefalexina oral (si hay infección secundaria)', dose:'22 mg/kg VO cada 12 horas si hay pústulas/exudado costroso', note:'Tratamiento de la pioderma secundaria causada por el rascado intenso.' }
+                ],
+                'topico': [
+                    { name:'Champú hidratante y calmante', dose:'Baños cada 4 días durante las primeras 2 semanas', note:'Disminuye el eritema y acondiciona la piel traumatizada por rascado.' }
+                ],
+                'entorno': [
+                    { name:'Control del prurito de transición', dose:'Apoquel (Oclacitinib) 0.4-0.6 mg/kg VO cada 12h durante los primeros 4 días', note:'Alivia el prurito agudo mientras el acaricida reduce la población de ácaros.' }
+                ]
+            }
+        },
+        'result-dermatitis-atopica-excl': {
+            diagnosis: 'Dermatitis Atópica Canina (DAC)',
+            confidence: 'Alta (92%)',
+            items: [
+                'Eritema y prurito bilateral en flexuras (axilas, ingles) y cara interdigital.',
+                'Reflejo otopodal negativo y ausencia de patrón auricular periférico compatible con sarna.',
+                'Historia de prurito crónico persistente tras exclusión de alergia alimentaria y DAP.'
+            ],
+            treats: {
+                'sistemico': [
+                    { name:'Oclacitinib (Apoquel®)', dose:'0.4-0.6 mg/kg VO cada 12 horas por 14 días, luego cada 24 horas', note:'Inhibidor de JAK-1. Bloquea selectivamente la vía inflamatoria del prurito con rapidez de acción (<4h).' },
+                    { name:'Lokivetmab SC (Cytopoint®) — Terapia Biológica', dose:'2 mg/kg subcutáneo cada 4-8 semanas según necesidad', note:'Anticuerpo monoclonal que neutraliza la IL-31. Excelente perfil de seguridad en tratamientos crónicos a largo plazo.' }
+                ],
+                'topico': [
+                    { name:'Champú de Ceramidas y Fitosfingosina', dose:'Baño semanal con tiempo de contacto de 10 minutos (Douxo S3®)', note:'Restaura la barrera lipídica deficiente en la piel del paciente atópico.' }
+                ],
+                'entorno': [
+                    { name:'Inmunoterapia específica (Vacuna)', dose:'Formulación de hiposensibilización alérgeno-específica', note:'Único tratamiento curativo modificador de la atopia. Requiere test intradérmico o serología IgE previa.' }
+                ]
+            }
+        }
+    }
+}
+};
+
+// ─────────────────────────────────────────────────────────────
+// CONFIGURACIÓN DE PATRONES EN PANTALLA INICIAL (FILTRABLE)
+// ─────────────────────────────────────────────────────────────
+const PATTERNS_LIST = [
+    {
+        key: 'alopécico',
+        title: 'Patrón Alopécico',
+        desc: 'Áreas de pérdida de pelo parcial o total. Parches circulares localizados o alopecia endocrina simétrica.',
+        badge: 'FÚNGICO / ENDOCRINO',
+        badgeClass: 'purple',
+        img: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=500&h=320&fit=crop&auto=format',
+        active: true
+    },
+    {
+        key: 'pustular_vesicular',
+        title: 'Patrón Pustular-vesicular',
+        desc: 'Elevaciones con contenido purulento (pústulas), vesículas transitorias o collaretes descamativos.',
+        badge: 'BACTERIANO / AUTOINMUNE',
+        badgeClass: 'orange',
+        img: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=500&h=320&fit=crop&auto=format',
+        active: true
+    },
+    {
+        key: 'pruriginoso',
+        title: 'Patrón Pruriginoso',
+        desc: 'Prurito persistente (rascado, lamido, mordisqueo). Eritema difuso en pliegues flexores o márgenes articulares.',
+        badge: 'ALÉRGICO / PARASITARIO',
+        badgeClass: 'red',
+        img: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=500&h=320&fit=crop&auto=format',
+        active: true
+    },
+    {
+        key: 'seborreico',
+        title: 'Patrón Descamativo-seborreico',
+        desc: 'Descamación excesiva, caspa, piel grasa u olor rancio. Lesiones descamativas en tronco.',
+        badge: 'PRÓXIMAMENTE',
+        badgeClass: 'gray',
+        img: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=500&h=320&fit=crop&auto=format',
+        active: false
+    },
+    {
+        key: 'ulcerativo',
+        title: 'Patrón Erosivo-ulcerativo',
+        desc: 'Pérdida de la integridad de la epidermis. Exudación húmeda, úlceras profundas, costras hemáticas.',
+        badge: 'PRÓXIMAMENTE',
+        badgeClass: 'gray',
+        img: 'https://images.unsplash.com/photo-1537151608828-ea2b117b6281?w=500&h=320&fit=crop&auto=format',
+        active: false
+    },
+    {
+        key: 'nodular',
+        title: 'Patrón Papulo-placo-nodular',
+        desc: 'Masas cutáneas sólidas. Elevaciones firmes de la dermis de diverso tamaño (pápulas o nódulos).',
+        badge: 'PRÓXIMAMENTE',
+        badgeClass: 'gray',
+        img: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=500&h=320&fit=crop&auto=format',
+        active: false
+    }
+];
+
+function renderPatternsGrid() {
+    const grid = document.getElementById('diseases-grid');
+    const filteredPatterns = configHideDev 
+        ? PATTERNS_LIST.filter(p => p.active) 
+        : PATTERNS_LIST;
+
+    grid.innerHTML = filteredPatterns.map(p => {
+        let clickHandler = p.active 
+            ? `startTree('${p.key}')` 
+            : `showLockedPattern('${p.title}', '${p.key}')`;
+            
+        let badgeEl = p.badge 
+            ? `<span class="card-overlay-badge ${p.badgeClass}">${p.badge}</span>` 
+            : '';
+
+        return `
+            <div class="disease-card" onclick="${clickHandler}">
+                <div class="card-image-container">
+                    <img src="${p.img}" alt="${p.title}" loading="lazy">
+                    ${badgeEl}
+                    <div class="card-icon-overlay">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 8 12 12 16 14"/></svg>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <h3>${p.title}</h3>
+                    <p>${p.desc}</p>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+
+
+
+// ─────────────────────────────────────────────────────────────
+// CONTROL DE FLUJO DE PANTALLAS
+// ─────────────────────────────────────────────────────────────
+let currentActiveTab = 'sistemico';
+
+function startTree(key) {
+    currentTree = key;
+    currentStepIdx = 0;
+    
+    renderStep();
+    showScreen('screen-tree');
+}
+
+function goHome() {
+    currentTree = null;
+    currentStepIdx = 0;
+    showScreen('screen-home');
+}
+
+function showScreen(screenId) {
+    document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+}
+
+function showLockedPattern(title, key) {
+    document.getElementById('locked-pattern-title').textContent = title + ' (En Calibración)';
+    document.getElementById('locked-pattern-desc').textContent = `El módulo para el ${title} se encuentra actualmente en fase de validación clínica de su base de datos. Estará disponible en la próxima actualización.`;
+    document.getElementById('locked-modal').style.display = 'block';
+    document.getElementById('locked-backdrop').style.display = 'block';
+}
+
+function closeLockedModal() {
+    document.getElementById('locked-modal').style.display = 'none';
+    document.getElementById('locked-backdrop').style.display = 'none';
+}
+
+// Genera los elementos visuales de la pregunta en la pantalla de consulta (Referencia clínica pura)
+function renderVisualReference(stepObj) {
+    if (stepObj.type === 'visual') {
+        // Retornar la foto de la lesión
+        return `
+            <div class="step-reference-photo-wrap">
+                <img src="${stepObj.img}" alt="Foto de lesión de referencia">
+            </div>
+        `;
+    } 
+    else if (stepObj.type === 'diagram') {
+        // Silueta anatómica estática de referencia
+        return `
+            <div class="step-reference-diagram-wrap">
+                <svg class="hud-dog-silhouette" viewBox="0 0 300 200">
+                    <path d="M 40,110 C 45,100 50,85 55,80 C 60,75 58,55 60,45 C 62,35 68,32 72,40 C 75,45 74,65 77,70 C 85,72 105,74 125,76 C 145,78 165,72 185,68 C 205,64 215,62 225,70 C 230,75 232,90 235,95 C 245,98 255,96 260,94 C 265,92 268,96 262,100 C 255,105 245,112 238,114 C 235,116 230,125 228,135 C 225,145 228,175 224,178 C 220,180 215,180 212,176 C 208,170 212,150 208,140 C 195,140 185,141 175,143 C 170,147 168,172 164,178 C 160,180 155,180 152,176 C 148,170 150,150 145,140 C 130,140 115,140 100,140 C 95,145 92,172 88,178 C 84,180 79,180 76,176 C 72,170 74,150 70,140 C 62,140 55,140 48,142 C 45,145 42,172 38,178 C 34,180 29,180 26,176 C 22,170 25,140 22,130 C 18,126 12,120 10,115 C 8,110 12,105 18,107 C 24,109 32,110 40,110 Z" 
+                        fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    ${renderManualHotspots(currentTree)}
+                </svg>
+            </div>
+        `;
+    } 
+    else if (stepObj.type === 'micro') {
+        // Lente de microscopio de referencia estático
+        let labSVG = "";
+        if (currentTree === 'pruriginoso') {
+            labSVG = `
+                <svg class="microscope-content-svg" viewBox="0 0 100 100">
+                    <path d="M 50,30 C 42,30 38,40 38,50 C 38,60 42,70 50,70 C 58,70 62,60 62,50 C 62,40 58,30 50,30 Z" fill="rgba(148,163,184,0.15)" stroke="var(--cyan)" stroke-width="1.5" />
+                    <circle cx="47" cy="42" r="1.5" fill="var(--danger)" />
+                    <circle cx="53" cy="42" r="1.5" fill="var(--danger)" />
+                    <path d="M 38,45 Q 26,40 22,45 M 38,52 Q 24,52 20,58 M 38,60 Q 24,68 22,75" fill="none" stroke="var(--cyan)" stroke-width="1.5" />
+                    <path d="M 62,45 Q 74,40 78,45 M 62,52 Q 76,52 80,58 M 62,60 Q 76,68 78,75" fill="none" stroke="var(--cyan)" stroke-width="1.5" />
+                </svg>
+            `;
+        } else if (currentTree === 'pustular_vesicular') {
+            labSVG = `
+                <svg class="microscope-content-svg" viewBox="0 0 100 100">
+                    <path d="M 50,22 C 34,22 18,34 18,50 C 18,64 28,72 38,77 C 46,80 60,82 72,75 C 82,67 82,50 82,40 C 82,26 66,22 50,22 Z" fill="rgba(99,102,241,0.1)" stroke="var(--primary)" stroke-width="1.2" stroke-dasharray="2 2" />
+                    <circle cx="46" cy="42" r="2.2" fill="var(--cyan)" />
+                    <circle cx="50" cy="44" r="2.2" fill="var(--cyan)" />
+                    <circle cx="44" cy="46" r="2.2" fill="var(--cyan)" />
+                    <circle cx="28" cy="38" r="2.2" fill="var(--cyan)" />
+                    <circle cx="70" cy="60" r="2.2" fill="var(--cyan)" />
+                </svg>
+            `;
+        } else if (currentTree === 'alopécico') {
+            labSVG = `
+                <svg class="microscope-content-svg" viewBox="0 0 100 100">
+                    <path d="M 30,0 L 45,100" stroke="#1e293b" stroke-width="8" />
+                    <path d="M 30,0 L 45,100" stroke="#10b981" stroke-width="3" />
+                    <path d="M 70,0 L 55,100" stroke="#1e293b" stroke-width="8" />
+                    <path d="M 70,0 L 55,100" stroke="#10b981" stroke-width="3" />
+                    <circle cx="35" cy="40" r="2.5" fill="#34d399" filter="drop-shadow(0 0 3px #10b981)" />
+                    <circle cx="65" cy="35" r="3" fill="#34d399" filter="drop-shadow(0 0 3px #10b981)" />
+                </svg>
+            `;
+        }
+        return `
+            <div class="step-reference-diagram-wrap">
+                <div class="microscope-lens">
+                    ${labSVG}
+                </div>
+            </div>
+        `;
+    }
+    return '';
+}
+
+// Retorna marcas fijas de hotspots para la silueta del perro
+function renderManualHotspots(treeKey) {
+    if (treeKey === 'pruriginoso') {
+        return `
+            <g>
+                <circle cx="68" cy="45" r="3.5" fill="var(--cyan)" />
+                <text x="76" y="44" fill="var(--text-secondary)" font-size="7" font-family="monospace">Bordes Auriculares</text>
+                <circle cx="88" cy="140" r="3.5" fill="var(--cyan)" />
+                <text x="96" y="143" fill="var(--text-secondary)" font-size="7" font-family="monospace">Codos</text>
+                <circle cx="168" cy="140" r="3.5" fill="var(--cyan)" />
+                <text x="178" y="143" fill="var(--text-secondary)" font-size="7" font-family="monospace">Tarsos</text>
+            </g>
+        `;
+    } else if (treeKey === 'pustular_vesicular') {
+        return `
+            <g>
+                <circle cx="130" cy="135" r="3.5" fill="var(--cyan)" />
+                <text x="140" y="138" fill="var(--text-secondary)" font-size="7" font-family="monospace">Abdomen Ventral</text>
+                <circle cx="105" cy="125" r="3.5" fill="var(--cyan)" />
+                <text x="115" y="123" fill="var(--text-secondary)" font-size="7" font-family="monospace">Pliegue Axilar</text>
+            </g>
+        `;
+    } else if (treeKey === 'alopécico') {
+        return `
+            <g>
+                <circle cx="50" cy="85" r="3.5" fill="var(--cyan)" />
+                <text x="22" y="74" fill="var(--text-secondary)" font-size="7" font-family="monospace">Cara / Hocico</text>
+                <circle cx="38" cy="165" r="3.5" fill="var(--cyan)" />
+                <text x="46" y="168" fill="var(--text-secondary)" font-size="7" font-family="monospace">Extr. Anteriores</text>
+                <circle cx="135" cy="78" r="3.5" fill="var(--cyan)" />
+                <text x="143" y="75" fill="var(--text-secondary)" font-size="7" font-family="monospace">Región Lumbar</text>
+            </g>
+        `;
+    }
+    return '';
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDERIZADO DE PASOS DEL ÁRBOL
+// ─────────────────────────────────────────────────────────────
+function renderStep() {
+    const t = TREES[currentTree];
+    const s = t.steps[currentStepIdx];
+    const total = t.steps.length;
+    const pct = ((currentStepIdx + 1) / total) * 100;
+
+    // Actualiza textos de progreso
+    document.getElementById('prog-title').textContent = t.phases[currentStepIdx];
+    document.getElementById('prog-step').textContent = `PASO ${currentStepIdx + 1} DE ${total}`;
+    document.getElementById('prog-fill').style.width = pct + '%';
+
+    // Rellena la terminal visual integrada (dentro de la misma tarjeta del paso para un look limpio y centrado)
+    const visualContent = renderVisualReference(s);
+
+    // Renderizar la tarjeta de decisión
+    const stepCard = document.getElementById('step-card');
+    stepCard.innerHTML = `
+        <div class="step-header-banner">
+            <h3>${s.title}</h3>
+            <p>${s.desc}</p>
+        </div>
+        ${visualContent}
+        <div class="step-body-content">
+            <div class="step-clinical-instruction">
+                ${s.instruct}
+            </div>
+            <div class="diagnostic-options-list">
+                ${s.opts.map(o => `
+                    <button class="option-button" onclick="chooseOption('${o.next}')">
+                        <div class="option-btn-icon ${o.type==='pos'?'pos':'neg'}">
+                            ${o.type==='pos'
+                                ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+                                : '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'}
+                        </div>
+                        <div class="option-btn-texts">
+                            <span class="title">${o.title}</span>
+                            <span class="desc">${o.desc}</span>
+                        </div>
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function chooseOption(next) {
+    if (next.startsWith('result-')) {
+        showResultScreen(next);
+    } else {
+        currentStepIdx = parseInt(next.split('-')[1]) - 1;
+        renderStep();
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// PANTALLA DE RESULTADOS Y TRATAMIENTOS
+// ─────────────────────────────────────────────────────────────
+let activeResultData = null;
+
+function showResultScreen(resultKey) {
+    const r = TREES[currentTree].results[resultKey];
+    activeResultData = r;
+    
+    document.getElementById('result-diagnosis-title').textContent = r.diagnosis;
+    document.getElementById('result-confidence-val').textContent = r.confidence;
+    
+    const confValEl = document.getElementById('result-confidence-val');
+    if (r.confidence.includes('Alta')) {
+        confValEl.className = 'val';
+        confValEl.style.color = 'var(--success)';
+        confValEl.style.borderColor = 'var(--success-border)';
+    } else if (r.confidence.includes('Intermedia')) {
+        confValEl.className = 'val';
+        confValEl.style.color = 'var(--warning)';
+        confValEl.style.borderColor = 'var(--warning-border)';
+    } else {
+        confValEl.className = 'val';
+        confValEl.style.color = 'var(--danger)';
+        confValEl.style.borderColor = 'var(--danger-border)';
+    }
+
+    const factsContainer = document.getElementById('result-facts-container');
+    factsContainer.innerHTML = r.items.map((item, idx) => `
+        <div class="fact-step-item">
+            <span class="fact-step-num">Fase ${idx + 1}</span>
+            <div>${item}</div>
+        </div>
+    `).join('');
+
+    const notesTextarea = document.getElementById('clinical-notes-textarea');
+    const today = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    
+    notesTextarea.value = `INFORME CLÍNICO DERMATOLÓGICO — FECHA: ${today}
+------------------------------------------------------------
+PACIENTE CANINO MOCK-DEMO
+SINTOMATOLOGÍA: Evaluación por patrón dermatológico primario.
+
+DIAGNÓSTICO PRESUNTIVO: ${r.diagnosis} (Confianza: ${r.confidence})
+CRITERIOS CLÍNICOS COMPROBADOS:
+${r.items.map((it, i) => ` - Fase ${i+1}: ${it}`).join('\n')}
+
+PROTOCOLO DE TRATAMIENTO:
+${Object.keys(r.treats).map(cat => {
+    let catName = cat === 'sistemico' ? 'Sistémico (Oral)' : cat === 'topico' ? 'Tópico / Acondicionamiento' : 'Manejo Ambiental';
+    return `[${catName}] \n` + r.treats[cat].map(t => `  * ${t.name}: ${t.dose}`).join('\n');
+}).join('\n')}
+------------------------------------------------------------
+Firma: Dr/a. Veterinario Clínico`;
+
+    renderTreatmentTabs();
+    showScreen('screen-result');
+}
+
+function renderTreatmentTabs() {
+    const r = activeResultData;
+    const tabsNav = document.getElementById('treatment-tabs-nav');
+    
+    const availableCategories = Object.keys(r.treats);
+    currentActiveTab = availableCategories[0];
+
+    tabsNav.innerHTML = availableCategories.map(cat => {
+        let label = "";
+        if (cat === 'sistemico') label = "Sistémico (Oral)";
+        else if (cat === 'topico') label = "Tópico / Baños";
+        else if (cat === 'entorno') label = "Medio / Soporte";
+        
+        return `
+            <button class="tab-nav-btn ${cat === currentActiveTab ? 'active' : ''}" 
+                    onclick="switchTreatmentTab('${cat}')">
+                ${label}
+            </button>
+        `;
+    }).join('');
+
+    renderTreatmentTabContent();
+}
+
+function switchTreatmentTab(categoryKey) {
+    currentActiveTab = categoryKey;
+    
+    document.querySelectorAll('.tab-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    const buttons = document.querySelectorAll('.tab-nav-btn');
+    buttons.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(`'${categoryKey}'`)) {
+            btn.classList.add('active');
+        }
+    });
+
+    renderTreatmentTabContent();
+}
+
+function renderTreatmentTabContent() {
+    const r = activeResultData;
+    const contentPanel = document.getElementById('treatment-tab-content');
+    const currentTreats = r.treats[currentActiveTab] || [];
+    
+    if (currentTreats.length === 0) {
+        contentPanel.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem;">No se requieren acciones específicas para esta categoría.</p>`;
+        return;
+    }
+
+    let cevaProduct = "Douxo S3 Calm Champú (Ceva)";
+    const diag = r.diagnosis.toLowerCase();
+    if (diag.includes('pioderma') || diag.includes('foliculitis') || diag.includes('fúngica') || diag.includes('tiña')) {
+        cevaProduct = "Douxo S3 Pyo Champú (Ceva) — Antiséptico purificante";
+    } else if (diag.includes('atopia') || diag.includes('areata')) {
+        cevaProduct = "Douxo S3 Calm Pipetas (Ceva) — Alivio de prurito y barrera cutánea";
+    } else if (diag.includes('seborreica') || diag.includes('endocrina') || diag.includes('atípica')) {
+        cevaProduct = "Douxo S3 Seb Champú (Ceva) — Control de descamación y grasa";
+    } else {
+        cevaProduct = "Douxo S3 Calm Champú (Ceva) — Hidratación y calma de prurito";
+    }
+
+    contentPanel.innerHTML = currentTreats.map(t => `
+        <div class="treatment-prescription-block">
+            <h4>${t.name}</h4>
+            <div class="dose-text">${t.dose}</div>
+            <div class="note-text"><strong>Indicaciones:</strong> ${t.note}</div>
+        </div>
+    `).join('') + `
+        <div class="ceva-cta-block" style="margin-top: 16px; padding: 14px; background: rgba(6, 182, 212, 0.08); border: 1px dashed var(--cyan-border); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+                <span style="font-size: 0.65rem; color: var(--cyan); font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Tratamiento Coadyuvante Recomendado</span>
+                <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary);">${cevaProduct}</span>
+            </div>
+            <a href="https://www.ceva.es/Productos" target="_blank" onclick="trackCevaClick()" class="btn-action btn-primary-action" style="padding: 6px 12px; font-size: 0.72rem; border-radius: var(--radius-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; margin-bottom: 0;">
+                <span>Ver Ficha Técnica</span>
+                <svg viewBox="0 0 24 24" style="width:12px; height:12px; stroke:currentColor; fill:none; stroke-width:3; margin-bottom:0;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+    `;
+}
+
+function copyClinicalRecord() {
+    const textarea = document.getElementById('clinical-notes-textarea');
+    textarea.select();
+    document.execCommand('copy');
+    
+    const copyBtn = document.querySelector('.btn-action-secondary');
+    const originalHTML = copyBtn.innerHTML;
+    copyBtn.innerHTML = `
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        ¡Copiado con Éxito!
+    `;
+    copyBtn.style.color = "var(--success)";
+    copyBtn.style.borderColor = "var(--success-border)";
+    
+    setTimeout(() => {
+        copyBtn.innerHTML = originalHTML;
+        copyBtn.style.color = "";
+        copyBtn.style.borderColor = "";
+    }, 2000);
+}
+
+function trackCevaClick() {
+    let clicks = parseInt(localStorage.getItem('ceva_clicks') || '0');
+    localStorage.setItem('ceva_clicks', (clicks + 1).toString());
+}
+
+// ─────────────────────────────────────────────────────────────
+// TEMA CLARO / OSCURO
+// ─────────────────────────────────────────────────────────────
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    
+    const themeLabel = document.getElementById('theme-label');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    if (newTheme === 'light') {
+        themeLabel.textContent = 'MODO OSCURO';
+        themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`; // Luna
+    } else {
+        themeLabel.textContent = 'MODO CLARO';
+        themeIcon.innerHTML = `
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        `; // Sol
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// INICIALIZACIÓN DE LA APLICACIÓN
+// ─────────────────────────────────────────────────────────────
+// (La inicialización ahora es manejada vía bootstrap() al final del documento)
+</script>
+<script src="app-seborreico.js"></script>
+<script src="data-seborreico.js"></script>
+<script>
+    bootstrap();
+</script>
+</body>
+</html>

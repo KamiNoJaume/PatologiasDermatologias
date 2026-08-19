@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DermVet Pro — Herramienta interactiva de orientación diagnóstica diferencial en dermatología canina.">
+    <title>DermVet Pro — Patrones Dermatológicos en Perros</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234f46e5'/%3E%3Cpath d='M12 7v10M7 12h10' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/pattern-flow.css">
+
+    <script src="js/app.js" defer></script>
+    <script src="data-seborreico.js" defer></script>
+</head>
+<body>
+<canvas id="microbe-canvas" aria-hidden="true"></canvas>
+
+<div class="app-container">
+
+    <!-- APP HEADER -->
+    <header class="app-header">
+        <div class="brand">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            </div>
+            <div class="brand-text">
+                <h1>PATRONES DERMATOLÓGICOS EN PERROS</h1>
+                <p>Orientación diagnóstica diferencial</p>
+            </div>
+        </div>
+
+        <div class="header-alliance">
+            <span>PATROCINADO POR</span>
+            <img src="Imagenes_Patologias/Douxo_LOGO.png" alt="Douxo" class="alliance-img">
+        </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <main class="main-layout">
+
+        <!-- SCREEN: INICIO (selección de patrón) -->
+        <section id="screen-home" class="screen-view active" aria-label="Menú de patrones">
+            <div class="hero-banner">
+                <span class="hero-badge">DermVet Pro · Terminal clínico</span>
+                <h2>Menú de patrones dermatológicos</h2>
+                <p>Selecciona el patrón dermatológico para iniciar el flujo interactivo de orientación diagnóstica diferencial, con las pruebas asociadas y el abordaje terapéutico general.</p>
+            </div>
+
+            <div class="grid-diseases" id="diseases-grid">
+                <!-- Generado dinámicamente por js/app.js -->
+            </div>
+        </section>
+
+        <!-- SCREEN: INFORMACIÓN DEL PATRÓN -->
+        <section id="screen-pattern-info" class="screen-view" aria-label="Información del patrón"></section>
+
+        <!-- SCREEN: PREGUNTA CLÍNICA -->
+        <section id="screen-question" class="screen-view" aria-label="Pregunta clínica"></section>
+
+        <!-- SCREEN: ORIENTACIÓN DIFERENCIAL -->
+        <section id="screen-differential" class="screen-view" aria-label="Orientación diagnóstica diferencial"></section>
+
+        <!-- SCREEN: ABORDAJE TERAPÉUTICO -->
+        <section id="screen-therapeutic" class="screen-view" aria-label="Abordaje terapéutico"></section>
+
+    </main>
+
+    <!-- APP FOOTER -->
+    <footer class="app-footer">
+        <p><strong>DermVet Pro</strong> — Herramienta de orientación diagnóstica diferencial. No sustituye el juicio clínico veterinario ni las pruebas diagnósticas confirmatorias.</p>
+    </footer>
+</div>
+
+<!-- MODAL: PATRÓN EN CALIBRACIÓN -->
+<div class="locked-backdrop" id="locked-backdrop" hidden></div>
+<div class="locked-modal" id="locked-modal" role="dialog" aria-modal="true" aria-labelledby="locked-pattern-title" aria-describedby="locked-pattern-desc" hidden>
+    <div class="modal-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h3 id="locked-pattern-title">Módulo en calibración</h3>
+    <p id="locked-pattern-desc">Este módulo de diagnóstico se encuentra actualmente en fase de validación clínica de su base de datos.</p>
+    <button type="button" class="btn-primary" id="locked-modal-close">Entendido</button>
+</div>
+
+<!-- Región para lectores de pantalla -->
+<div id="screen-status" class="sr-only" aria-live="polite"></div>
+
+</body>
+</html>

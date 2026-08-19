@@ -1,0 +1,47 @@
+RESUMEN — Sistema de Login para Veterinaria
+==========================================
+
+ESTADO ACTUAL
+-------------
+El proyecto esta construido y compila sin errores.
+Tecnologias usadas: Next.js 16 + React 19 + Prisma + PostgreSQL + Tailwind.
+
+QUE HAY HECHO
+-------------
+- Pagina de Login con formulario (email + contraseña)
+- Pagina de Registro (nombre, email, contraseña, fecha nacimiento, checkboxes legales)
+- Verificacion de email por token
+- Landing page protegida (solo accesible tras login) con boton a demos
+- Portal de demos con 3 secciones: Medicamentos, Patologias, Productos
+- Paginas legales: Terminos, Privacidad, Cookies, Aviso Legal
+- Middleware que protege las rutas privadas (/landing, /demo/*)
+- Cierre de sesion desde la landing
+
+Mejoras de usabilidad:
+- Notificaciones toast (errores y exitos aparecen como ventanas emergentes)
+- Boton para mostrar/ocultar la contraseña al escribir
+- Barra de fortaleza de contraseña en tiempo real (Debil a Fuerte)
+- Spinner animado en botones mientras se procesa el envio
+- Pagina 404 personalizada cuando una ruta no existe
+- Pantalla de error con boton de reintentar
+- Esqueletos de carga (skeletons) mientras se cargan las paginas
+
+QUE FALTA PARA USARLO
+---------------------
+1. Tener PostgreSQL instalado y configurar la direccion en el archivo .env
+2. Ejecutar "npx prisma migrate dev --name init" para crear las tablas
+3. Configurar un email real (SMTP) para enviar verificaciones
+4. Generar una clave secreta segura (AUTH_SECRET) en .env
+
+QUE FALTA PARA PRODUCCION
+-------------------------
+- Limitar intentos de login/registro (rate limiting)
+- Pagina de perfil de usuario y opcion de borrar cuenta
+- Recuperacion de contraseña
+- Banner de cookies funcional
+- Diseño responsive completo y pulido
+
+COMO ARRANCAR
+-------------
+npm run dev       -> servidor de desarrollo
+npm run build     -> compilar para produccion
