@@ -78,7 +78,7 @@ export async function GET(
 }
 
 const LOGOUT_INJECTION = `
-<div id="dermvet-logout" style="position:fixed;top:12px;right:12px;z-index:99999;display:flex;gap:8px;align-items:center;">
+<div id="dermvet-logout" style="position:fixed;right:max(16px, env(safe-area-inset-right));bottom:max(16px, env(safe-area-inset-bottom));z-index:99999;display:flex;gap:8px;align-items:center;">
   <button id="dermvet-logout-btn" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:8px 14px;font:600 13px/1 'Plus Jakarta Sans',system-ui,sans-serif;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.25);">Cerrar sesión</button>
 </div>
 <script>

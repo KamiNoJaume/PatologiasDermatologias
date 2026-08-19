@@ -71,7 +71,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <Input
         label="Email"
         name="email"
@@ -79,19 +79,25 @@ export function LoginForm() {
         placeholder="tu@email.com"
         autoComplete="email"
         error={fieldErrors.email}
+        className="rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 hover:border-slate-300 focus:border-[#4f46e5] focus:ring-[#4f46e5]/20"
       />
 
       <Input
-        label="Contrasena"
+        label="Contraseña"
         name="password"
         type="password"
-        placeholder="Tu contrasena"
+        placeholder="Tu contraseña"
         autoComplete="current-password"
         error={fieldErrors.password}
+        className="rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder:text-slate-400 hover:border-slate-300 focus:border-[#4f46e5] focus:ring-[#4f46e5]/20"
       />
 
-      <Button type="submit" loading={loading}>
-        Iniciar sesion
+      <Button
+        type="submit"
+        loading={loading}
+        className="mt-2 rounded-xl bg-[#4f46e5] py-3 text-[0.9rem] shadow-[0_8px_18px_rgba(79,70,229,0.22)] hover:bg-[#4338ca] focus:ring-[#4f46e5]"
+      >
+        Entrar en DermVet Pro
       </Button>
     </form>
   );

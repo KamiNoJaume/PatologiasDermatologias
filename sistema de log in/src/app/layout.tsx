@@ -3,8 +3,8 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Veterinaria - Login",
-  description: "Sistema de gestion veterinaria",
+  title: "DermVet Pro — Acceso clínico",
+  description: "Acceso seguro a DermVet Pro",
 };
 
 export default function RootLayout({
